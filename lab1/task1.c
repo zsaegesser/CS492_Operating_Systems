@@ -44,14 +44,14 @@ void *diner(int *i)
     sleep( v/2);
     printf("%d is hungry\n", v);
     pthread_mutex_lock(&bi_mutex);
-    //pthread_mutex_lock(&fork_mutex[v]);
-    //pthread_mutex_lock(&fork_mutex[(v+1)%NUMP]);
+    pthread_mutex_lock(&fork_mutex[v]);
+    pthread_mutex_lock(&fork_mutex[(v+1)%NUMP]);
     printf("%d is eating\n", v);
     eating++;
     sleep(1);
     printf("%d is done eating\n", v);
-    //pthread_mutex_unlock(&fork_mutex[v]);
-    //pthread_mutex_unlock(&fork_mutex[(v+1)%NUMP]);
+    pthread_mutex_unlock(&fork_mutex[v]);
+    pthread_mutex_unlock(&fork_mutex[(v+1)%NUMP]);
     pthread_mutex_unlock(&bi_mutex);
   }
   pthread_exit(NULL);
