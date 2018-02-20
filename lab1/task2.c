@@ -7,13 +7,19 @@
 #define NUMP 5
 
 pthread_mutex_t fork_mutex[NUMP];
-
+pthread_mutex_t mutex;
+pthread_cond_t cond;
+int count = 0;
 int main()
 {
   int i;
   pthread_t diner_thread[NUMP];
   int dn[NUMP];
   void *diner();
+
+  pthread_mutex_init(&mutex, NULL);
+  pthread_cond_init(&cond, NULL);
+
   for (i=0;i<NUMP;i++)
     pthread_mutex_init(&fork_mutex[i], NULL);
 
@@ -21,12 +27,15 @@ int main()
     dn[i] = i;
     pthread_create(&diner_thread[i],NULL,diner,&dn[i]);
   }
+
   for (i=0;i<NUMP;i++)
     pthread_join(diner_thread[i],NULL);
 
   for (i=0;i<NUMP;i++)
     pthread_mutex_destroy(&fork_mutex[i]);
 
+  pthread_mutex_destroy(&mutex);
+  pthread_cond_destroy(&cond);
   pthread_exit(0);
 
 }
@@ -41,6 +50,16 @@ void *diner(int *i)
     printf("%d is thinking\n", v);
     sleep( v/2);
     printf("%d is hungry\n", v);
+
+
+    pthread_mutex_lock(&mutex);
+    while(count == 4){
+      pthread_cond_wait(&cond, &mutex);
+    }
+    count++;
+    pthread_mutex_unlock(&mutex);
+
+
     pthread_mutex_lock(&fork_mutex[v]);
     pthread_mutex_lock(&fork_mutex[(v+1)%NUMP]);
     printf("%d is eating\n", v);
@@ -49,6 +68,14 @@ void *diner(int *i)
     printf("%d is done eating\n", v);
     pthread_mutex_unlock(&fork_mutex[v]);
     pthread_mutex_unlock(&fork_mutex[(v+1)%NUMP]);
+
+
+    pthread_mutex_lock(&mutex);
+    count--;
+    pthread_cond_signal(&cond);
+    pthread_mutex_unlock(&mutex);
+
+
   }
   pthread_exit(NULL);
 }
