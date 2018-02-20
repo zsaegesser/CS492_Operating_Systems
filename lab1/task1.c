@@ -13,6 +13,7 @@ pthread_mutex_t bi_mutex;
 int main()
 {
   int i;
+  pthread_mutex_init(&bi_mutex, NULL);
   pthread_t diner_thread[NUMP];
   int dn[NUMP];
   void *diner();
