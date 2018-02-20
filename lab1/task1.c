@@ -30,7 +30,7 @@ int main()
   for (i=0;i<NUMP;i++)
     pthread_mutex_destroy(&fork_mutex[i]);
 
-  pthread_mutex_destroy(&bi_mutex)
+  pthread_mutex_destroy(&bi_mutex);
   pthread_exit(0);
 
 }
