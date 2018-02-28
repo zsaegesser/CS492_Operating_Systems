@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
+#include "products.h"
 using namespace std;
 
 int main(int argc,char* argv[]){
@@ -67,6 +68,8 @@ int main(int argc,char* argv[]){
   }
   /*Error Checking done*/ // I think
 
+  /*Set the seed of all random numbers in the program*/
+  srand(seed);
 
   //cout << numCons  << ", " << numProducer << ", " << totalProducts << ", " << qSize << ", " << schedAlgo << ", " << quantum << ", " << seed << endl;
   return 0;
