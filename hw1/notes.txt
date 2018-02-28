@@ -1,0 +1,9 @@
+Parts:
+1. input handling
+    -command prompt parameter handling
+2. Scheduling Algorithms
+    -first come, first serve
+    -round robin
+3. Products
+4. Producer and Consumer Threads
+5.
