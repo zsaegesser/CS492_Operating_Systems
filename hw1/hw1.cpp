@@ -10,32 +10,36 @@ using namespace std;
 
 //global condition variables & mutexes
 pthread_cond_t queueCount;
-pthread_mutex_t pidMutex;
-pthread_mutex_t queueMutex;
+pthread_mutex_t pidMutex;   //used for making the producers a FCFS algo
+pthread_mutex_t queueMutex; //used for protecting insertion and poping of the queue
 
 /* Super special critical section stuff */
 int pidCount = 0; //pid count for creating new product id's
 std::queue<Product> pq; // Product Queue with no fixed size
 int totProducts;
 
-
+/*Producer:
+FCFS Algorithm using Mutex to ensure only one producer is creating a Product at once
+*/
 void *producer(void *threadid){
   int producerId;
   int  productId;
   producerId = (intptr_t)threadid;
+
 
   //mutex protected access to global pidCount
   pthread_mutex_lock(&pidMutex);
   while(pidCount != totProducts){
     productId = pidCount;
     pidCount++;
-    pthread_mutex_unlock(&pidMutex); //allows other threads to make products
-
     Product p = Product(productId);
+
     pthread_mutex_lock(&queueMutex);
     pq.push(p);//add to queue
     cout << "I'm a producer: " << producerId << " and I'm adding product: " << p.get_id() << " to the queue, now size: " << pq.size() << endl;
     pthread_mutex_unlock(&queueMutex);
+
+    pthread_mutex_unlock(&pidMutex); //allows other threads to make products
     usleep(100);
     pthread_mutex_lock(&pidMutex); // protects condition
   }
@@ -44,9 +48,15 @@ void *producer(void *threadid){
   pthread_exit(NULL);
 }
 
+
+
+
 void *consumer0(){
 //First come first serve
 }
+
+
+
 void *Consumer1(){
 //round robin
 }
@@ -117,8 +127,6 @@ int main(int argc,char* argv[]){
 
   /*Set the seed of all random numbers in the program*/
   srand(seed);
-
-  //cout << numCons  << ", " << numProducer << ", " << totalProducts << ", " << qSize << ", " << schedAlgo << ", " << quantum << ", " << seed << endl;
 
   /* Creating Producers based on Param2*/
   pthread_t pThreads[numProducer];

@@ -29,4 +29,14 @@ I'm a producer: 3 and I'm adding product: 11 to the queue, now size: 12
 
 The next step would be to use the queueCount condition variable to hault the producers when the queue is full but that brings up the dilemma of whether or not we should make the queue size a global as well! This is getting pretty ugly
 
+
+# GOOD MORNING CHRISTOPHER 3/1 Update
+
+### Why is there pthread_exit(NULL) at tje bottom of the main???
+
+#### Producers
+I changed up the producer slightly, he wants us to create products on a FCFS basis so we have to force only one producer at once for all aspects of creating products.
+
+
+
 ![mad potter](https://media.giphy.com/media/FWankyZyB90Ji/giphy.gif)
