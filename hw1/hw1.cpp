@@ -42,14 +42,12 @@ void *producer(void *threadid){
   producerId = (intptr_t)threadid;
 
 
-  //mutex protected access to global pidCount
+  //mutex protected
   pthread_mutex_lock(&producerMutex);
   while(pidCount != totProducts){ //access pidCount inside pidMutex
     productId = pidCount;
     pidCount++;
-    //pthread_mutex_unlock(&pidMutex); //no longer accessing or manipulating pidCont so we release
 
-    //pthread_mutex_lock(&producerMutex);
     Product p = Product(productId); //create product inside producerMutex
 
     pthread_mutex_lock(&queueMutex); //about to access Queue so need queue mutex
@@ -61,12 +59,9 @@ void *producer(void *threadid){
     pthread_mutex_unlock(&queueMutex); //done insering into queue, release queue mutex
     pthread_cond_signal(&queueCount); //queue size has been increased, signal all waiting consumers
     pthread_mutex_unlock(&producerMutex); //release producer mutex so that during sleep other producers can execute
-    //pthread_mutex_unlock(&pidMutex); //allows other threads to make products
     usleep(100000);
-    //pthread_mutex_lock(&producerMutex); //we are about to begin creating another product, must acquire producer mutex again to ensure FCFS
     pthread_mutex_lock(&producerMutex); // protects pidCount
   }
-  //pthread_mutex_unlock(&pidMutex);
   pthread_mutex_unlock(&producerMutex); //done, release everything so other producer threads can exit
 
   pthread_exit(NULL); //exit
