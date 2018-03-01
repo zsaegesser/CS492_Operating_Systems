@@ -4,6 +4,8 @@
 
 Fuck trying to make pthread_create pass multiple arguments to the threads. It was getting waaaay too complicated just to send arguments. I had to make a struct that contained the args which wasn't working because it was being sent casted as a void pointer which lead to ownership problems that would have required dozens of extra lines to fix.... so I made another global instead to pass the max products. I had your arg parsing section set the global instead of the local which was probably a bad idea.
 
+Also I know about the compiler warning, I don't really know what to do about that.
+
 
 
 ### Current printout on my end :
