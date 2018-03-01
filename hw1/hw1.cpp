@@ -19,10 +19,19 @@ pthread_mutex_t consumerMutex;
 int pidCount = 0; //pid count for creating new product id's
 std::queue<Product> pq; // Product Queue with no fixed size
 int totProducts;
-
+int pConsumed =0;
 // Global variables
 int gQSize;
 
+
+int fn(int n){
+  if(n>1){
+    return n*fn(n-1);
+  }
+  else {
+    return 1;
+  }
+}
 
 /*Producer:
 FCFS Algorithm using Mutex to ensure only one producer is creating a Product at once
@@ -34,13 +43,13 @@ void *producer(void *threadid){
 
 
   //mutex protected access to global pidCount
-  pthread_mutex_lock(&pidMutex);
+  pthread_mutex_lock(&producerMutex);
   while(pidCount != totProducts){ //access pidCount inside pidMutex
     productId = pidCount;
     pidCount++;
-    pthread_mutex_unlock(&pidMutex); //no longer accessing or manipulating pidCont so we release
+    //pthread_mutex_unlock(&pidMutex); //no longer accessing or manipulating pidCont so we release
 
-    pthread_mutex_lock(&producerMutex);
+    //pthread_mutex_lock(&producerMutex);
     Product p = Product(productId); //create product inside producerMutex
 
     pthread_mutex_lock(&queueMutex); //about to access Queue so need queue mutex
@@ -50,13 +59,14 @@ void *producer(void *threadid){
     pq.push(p); //add to queue
     cout << "I'm a producer: " << producerId << " and I'm adding product: " << p.get_id() << " to the queue, now size: " << pq.size() << endl;
     pthread_mutex_unlock(&queueMutex); //done insering into queue, release queue mutex
+    pthread_cond_signal(&queueCount); //queue size has been increased, signal all waiting consumers
     pthread_mutex_unlock(&producerMutex); //release producer mutex so that during sleep other producers can execute
     //pthread_mutex_unlock(&pidMutex); //allows other threads to make products
     usleep(100);
     //pthread_mutex_lock(&producerMutex); //we are about to begin creating another product, must acquire producer mutex again to ensure FCFS
-    pthread_mutex_lock(&pidMutex); // protects pidCount
+    pthread_mutex_lock(&producerMutex); // protects pidCount
   }
-  pthread_mutex_unlock(&pidMutex);
+  //pthread_mutex_unlock(&pidMutex);
   pthread_mutex_unlock(&producerMutex); //done, release everything so other producer threads can exit
 
   pthread_exit(NULL); //exit
@@ -66,12 +76,29 @@ void *producer(void *threadid){
 
 
 void *consumer0(void *threadid){
-  // int consumerId;
-  // consumerId = (intptr_t)threadid;
-  //
-  // pthread_mutex_lock(&consumerMutex);
-  // while()
-
+  int consumerID = (intptr_t)threadid;
+  pthread_mutex_lock(&consumerMutex);
+  while(pConsumed < totProducts){
+    pthread_mutex_lock(&queueMutex);
+    while(pq.size() == 0){
+      pthread_cond_wait(&queueCount, &queueMutex);
+    }
+    Product currProduct = pq.front();
+    pq.pop();
+    pthread_mutex_unlock(&queueMutex);
+    int dontcare = 0;
+    for(int i = 0; i < currProduct.get_life(); i++){
+      dontcare = fn(10);
+    }
+    pConsumed++;
+    cout << "I'm Consumer: " << consumerID << " and I consumed product: " << currProduct.get_id() << endl;
+    //DELETE PRODUCT?????
+    pthread_mutex_unlock(&consumerMutex);
+    usleep(100);
+    pthread_mutex_lock(&consumerMutex);
+  }
+  pthread_mutex_unlock(&consumerMutex);
+  pthread_exit(NULL);
 }
 
 
