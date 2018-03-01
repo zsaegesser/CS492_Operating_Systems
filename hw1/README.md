@@ -39,9 +39,56 @@ I changed up the producer slightly, he wants us to create products on a FCFS bas
 ##### Queue in Producers
 The condition variable stuff for inserting into the queue is done. I tested it by makeing the queue size less than the total products and it dead locks the program when the queue hits that size (which is what should happen cause there are no consumers).
 
+#### Consumer FCFS
+I think I finished consumers on FCFS basis. Double check there arent any huge flaws in this traces please. Here is the printout:
+~~~
+╭─zach@pendrive ~/Documents/CS492/gitCS492/hw1  ‹master*›
+╰─$ ./hw1 10 10 20 100 0 10 1
+I'm a producer: 0 and I'm adding product: 0 to the queue, now size: 1
+I'm a producer: 1 and I'm adding product: 1 to the queue, now size: 2
+I'm a producer: 2 and I'm adding product: 2 to the queue, now size: 3
+I'm a producer: 3 and I'm adding product: 3 to the queue, now size: 4
+I'm a producer: 4 and I'm adding product: 4 to the queue, now size: 5
+I'm a producer: 5 and I'm adding product: 5 to the queue, now size: 6
+I'm a producer: 6 and I'm adding product: 6 to the queue, now size: 7
+I'm a producer: 7 and I'm adding product: 7 to the queue, now size: 7
+I'm Consumer: 0 and I consumed product: 0
+I'm a producer: 8 and I'm adding product: 8 to the queue, now size: 8
+I'm a producer: 9 and I'm adding product: 9 to the queue, now size: 8
+I'm Consumer: 1 and I consumed product: 1
+I'm Consumer: 2 and I consumed product: 2
+I'm Consumer: 3 and I consumed product: 3
+I'm Consumer: 4 and I consumed product: 4
+I'm Consumer: 7 and I consumed product: 5
+I'm Consumer: 5 and I consumed product: 6
+I'm Consumer: 6 and I consumed product: 7
+I'm Consumer: 8 and I consumed product: 8
+I'm Consumer: 9 and I consumed product: 9
+I'm a producer: 0 and I'm adding product: 10 to the queue, now size: 1
+I'm a producer: 2 and I'm adding product: 11 to the queue, now size: 2
+I'm a producer: 1 and I'm adding product: 12 to the queue, now size: 3
+I'm a producer: 3 and I'm adding product: 13 to the queue, now size: 4
+I'm a producer: 4 and I'm adding product: 14 to the queue, now size: 5
+I'm a producer: 5 and I'm adding product: 15 to the queue, now size: 6
+I'm a producer: 6 and I'm adding product: 16 to the queue, now size: 7
+I'm a producer: 7 and I'm adding product: 17 to the queue, now size: 8
+I'm Consumer: 0 and I consumed product: 10
+I'm a producer: 8 and I'm adding product: 18 to the queue, now size: 8
+I'm a producer: 9 and I'm adding product: 19 to the queue, now size: 9
+I'm Consumer: 1 and I consumed product: 11
+I'm Consumer: 2 and I consumed product: 12
+I'm Consumer: 3 and I consumed product: 13
+I'm Consumer: 4 and I consumed product: 14
+I'm Consumer: 7 and I consumed product: 15
+I'm Consumer: 5 and I consumed product: 16
+I'm Consumer: 6 and I consumed product: 17
+I'm Consumer: 8 and I consumed product: 18
+I'm Consumer: 9 and I consumed product: 19
+~~~
 
 ## NEXT STEPS
-Create the Consumer FCFS algo. Gonna be very similar to that producers, just different mutexes and we have to do fn(10) for the life of the product
+Create the Consumer RR algo, the hard part.
 
+![hp1](https://media.giphy.com/media/Cipj5jNsyTcxG/giphy.gif)
 
 ![mad potter](https://media.giphy.com/media/FWankyZyB90Ji/giphy.gif)

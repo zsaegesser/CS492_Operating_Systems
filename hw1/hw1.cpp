@@ -62,7 +62,7 @@ void *producer(void *threadid){
     pthread_cond_signal(&queueCount); //queue size has been increased, signal all waiting consumers
     pthread_mutex_unlock(&producerMutex); //release producer mutex so that during sleep other producers can execute
     //pthread_mutex_unlock(&pidMutex); //allows other threads to make products
-    usleep(100);
+    usleep(100000);
     //pthread_mutex_lock(&producerMutex); //we are about to begin creating another product, must acquire producer mutex again to ensure FCFS
     pthread_mutex_lock(&producerMutex); // protects pidCount
   }
@@ -76,6 +76,7 @@ void *producer(void *threadid){
 
 
 void *consumer0(void *threadid){
+
   int consumerID = (intptr_t)threadid;
   pthread_mutex_lock(&consumerMutex);
   while(pConsumed < totProducts){
@@ -86,6 +87,7 @@ void *consumer0(void *threadid){
     Product currProduct = pq.front();
     pq.pop();
     pthread_mutex_unlock(&queueMutex);
+    pthread_cond_signal(&queueCount);
     int dontcare = 0;
     for(int i = 0; i < currProduct.get_life(); i++){
       dontcare = fn(10);
@@ -94,7 +96,7 @@ void *consumer0(void *threadid){
     cout << "I'm Consumer: " << consumerID << " and I consumed product: " << currProduct.get_id() << endl;
     //DELETE PRODUCT?????
     pthread_mutex_unlock(&consumerMutex);
-    usleep(100);
+    usleep(100000);
     pthread_mutex_lock(&consumerMutex);
   }
   pthread_mutex_unlock(&consumerMutex);
@@ -187,6 +189,20 @@ int main(int argc,char* argv[]){
     }
 
   }
+
+  pthread_t cThreads[numCons];
+  int rc2;
+  int i2;
+  for (i2 = 0; i2 < numCons; i2++){
+    rc2 = pthread_create(&cThreads[i2], NULL, consumer0, (void *)i2);
+
+    if (rc2) {
+      cout << "Error:unable to create thread," << rc2 << endl;
+      exit(-1);
+    }
+
+  }
+
   pthread_exit(NULL);
 
 
