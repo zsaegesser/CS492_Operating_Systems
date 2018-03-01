@@ -10,8 +10,10 @@ using namespace std;
 
 //global condition variables & mutexes
 pthread_cond_t queueCount;
-pthread_mutex_t pidMutex;   //used for making the producers a FCFS algo
+pthread_mutex_t pidMutex;   //used for making ensuring only one thread accessing pid at once
+pthread_mutex_t producerMutex; //used to ensure FCFS in producers
 pthread_mutex_t queueMutex; //used for protecting insertion and poping of the queue
+pthread_mutex_t consumerMutex;
 
 /* Super special critical section stuff */
 int pidCount = 0; //pid count for creating new product id's
@@ -33,33 +35,43 @@ void *producer(void *threadid){
 
   //mutex protected access to global pidCount
   pthread_mutex_lock(&pidMutex);
-  while(pidCount != totProducts){
+  while(pidCount != totProducts){ //access pidCount inside pidMutex
     productId = pidCount;
     pidCount++;
-    Product p = Product(productId);
+    pthread_mutex_unlock(&pidMutex); //no longer accessing or manipulating pidCont so we release
 
-    pthread_mutex_lock(&queueMutex);
-    while(pq.size() == gQSize){
+    pthread_mutex_lock(&producerMutex);
+    Product p = Product(productId); //create product inside producerMutex
+
+    pthread_mutex_lock(&queueMutex); //about to access Queue so need queue mutex
+    while(pq.size() == gQSize){   //condition variable, if the queue is full, wait to insert product
         pthread_cond_wait(&queueCount, &queueMutex);
     }
-    pq.push(p);//add to queue
+    pq.push(p); //add to queue
     cout << "I'm a producer: " << producerId << " and I'm adding product: " << p.get_id() << " to the queue, now size: " << pq.size() << endl;
-    pthread_mutex_unlock(&queueMutex);
-
-    pthread_mutex_unlock(&pidMutex); //allows other threads to make products
+    pthread_mutex_unlock(&queueMutex); //done insering into queue, release queue mutex
+    pthread_mutex_unlock(&producerMutex); //release producer mutex so that during sleep other producers can execute
+    //pthread_mutex_unlock(&pidMutex); //allows other threads to make products
     usleep(100);
-    pthread_mutex_lock(&pidMutex); // protects condition
+    //pthread_mutex_lock(&producerMutex); //we are about to begin creating another product, must acquire producer mutex again to ensure FCFS
+    pthread_mutex_lock(&pidMutex); // protects pidCount
   }
   pthread_mutex_unlock(&pidMutex);
+  pthread_mutex_unlock(&producerMutex); //done, release everything so other producer threads can exit
 
-  pthread_exit(NULL);
+  pthread_exit(NULL); //exit
 }
 
 
 
 
-void *consumer0(){
-//First come first serve
+void *consumer0(void *threadid){
+  // int consumerId;
+  // consumerId = (intptr_t)threadid;
+  //
+  // pthread_mutex_lock(&consumerMutex);
+  // while()
+
 }
 
 
@@ -91,11 +103,11 @@ int main(int argc,char* argv[]){
 
   /*conversions to ints and error checking that all inputs are numbers*/
 
-  if(!(s1 >> numCons)){
+  if(!(s1 >> numProducer)){
     cout << "Invalid Number" << endl;
     return -1;
   }
-  if(!(s2 >> numProducer)){
+  if(!(s2 >> numCons)){
     cout << "Invalid Number" << endl;
     return -1;
   }
