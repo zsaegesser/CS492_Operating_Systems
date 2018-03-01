@@ -18,6 +18,10 @@ int pidCount = 0; //pid count for creating new product id's
 std::queue<Product> pq; // Product Queue with no fixed size
 int totProducts;
 
+// Global variables
+int gQSize;
+
+
 /*Producer:
 FCFS Algorithm using Mutex to ensure only one producer is creating a Product at once
 */
@@ -35,6 +39,9 @@ void *producer(void *threadid){
     Product p = Product(productId);
 
     pthread_mutex_lock(&queueMutex);
+    while(pq.size() == gQSize){
+        pthread_cond_wait(&queueCount, &queueMutex);
+    }
     pq.push(p);//add to queue
     cout << "I'm a producer: " << producerId << " and I'm adding product: " << p.get_id() << " to the queue, now size: " << pq.size() << endl;
     pthread_mutex_unlock(&queueMutex);
@@ -127,7 +134,7 @@ int main(int argc,char* argv[]){
 
   /*Set the seed of all random numbers in the program*/
   srand(seed);
-
+  gQSize = qSize;
   /* Creating Producers based on Param2*/
   pthread_t pThreads[numProducer];
   int rc;

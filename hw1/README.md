@@ -36,7 +36,12 @@ The next step would be to use the queueCount condition variable to hault the pro
 
 #### Producers
 I changed up the producer slightly, he wants us to create products on a FCFS basis so we have to force only one producer at once for all aspects of creating products.
+##### Queue in Producers
+The condition variable stuff for inserting into the queue is done. I tested it by makeing the queue size less than the total products and it dead locks the program when the queue hits that size (which is what should happen cause there are no consumers).
 
+
+## NEXT STEPS
+Create the Consumer FCFS algo. Gonna be very similar to that producers, just different mutexes and we have to do fn(10) for the life of the product
 
 
 ![mad potter](https://media.giphy.com/media/FWankyZyB90Ji/giphy.gif)
