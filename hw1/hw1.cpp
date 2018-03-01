@@ -1,9 +1,55 @@
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
+#include <stdint.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <queue>
 #include "products.h"
 using namespace std;
 
+//global condition variables & mutexes
+pthread_cond_t queueCount;
+pthread_mutex_t pidMutex;
+pthread_mutex_t queueMutex;
+
+/* Super special critical section stuff */
+int pidCount = 0; //pid count for creating new product id's
+std::queue<Product> pq; // Product Queue with no fixed size
+int totProducts;
+
+
+void *producer(void *threadid){
+  int producerId;
+  int  productId;
+  producerId = (intptr_t)threadid;
+
+  //mutex protected access to global pidCount
+  pthread_mutex_lock(&pidMutex);
+  while(pidCount != totProducts){
+    productId = pidCount;
+    pidCount++;
+    pthread_mutex_unlock(&pidMutex); //allows other threads to make products
+
+    Product p = Product(productId);
+    pthread_mutex_lock(&queueMutex);
+    pq.push(p);//add to queue
+    cout << "I'm a producer: " << producerId << " and I'm adding product: " << p.get_id() << " to the queue, now size: " << pq.size() << endl;
+    pthread_mutex_unlock(&queueMutex);
+    usleep(100);
+    pthread_mutex_lock(&pidMutex); // protects condition
+  }
+  pthread_mutex_unlock(&pidMutex);
+
+  pthread_exit(NULL);
+}
+
+void *consumer0(){
+//First come first serve
+}
+void *Consumer1(){
+//round robin
+}
 int main(int argc,char* argv[]){
   int numCons = 0;        //Param1 Number of Consumer Threads
   int numProducer = 0;    //Param2 Number of Producer Threads
@@ -36,7 +82,8 @@ int main(int argc,char* argv[]){
     cout << "Invalid Number" << endl;
     return -1;
   }
-  if(!(s3 >> totalProducts)){
+  //Had this change the global instead of the local
+  if(!(s3 >> totProducts)){
     cout << "Invalid Number" << endl;
     return -1;
   }
@@ -58,7 +105,7 @@ int main(int argc,char* argv[]){
   }
 
   /*Error checking on specific mandatory conditions on the inputs*/
-  if(numCons <= 0 || numProducer <=0 || totalProducts <= 0 || quantum <= 0 || seed < 0 || qSize < 0){
+  if(numCons <= 0 || numProducer <=0 || totProducts <= 0 || quantum <= 0 || seed < 0 || qSize < 0){
     cout << "Inputs cannot be negative" << endl;
     return -1;
   }
@@ -72,5 +119,23 @@ int main(int argc,char* argv[]){
   srand(seed);
 
   //cout << numCons  << ", " << numProducer << ", " << totalProducts << ", " << qSize << ", " << schedAlgo << ", " << quantum << ", " << seed << endl;
+
+  /* Creating Producers based on Param2*/
+  pthread_t pThreads[numProducer];
+  int rc;
+  int i;
+  for (i = 0; i < numProducer; i++){
+    rc = pthread_create(&pThreads[i], NULL, producer, (void *)i);
+
+    if (rc) {
+      cout << "Error:unable to create thread," << rc << endl;
+      exit(-1);
+    }
+
+  }
+  pthread_exit(NULL);
+
+
+
   return 0;
 }
