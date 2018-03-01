@@ -20,9 +20,12 @@ pthread_mutex_t consumerMutex;
 int pidCount = 0; //pid count for creating new product id's
 std::queue<Product> pq; // Product Queue with no fixed size
 int pConsumed =0;
+int consumerCountID;
 // Global variables
 int gQSize;
 int totProducts;
+int gQuantum;
+int totalConsumers;
 
 
 int fn(int n){
@@ -56,7 +59,7 @@ void *producer(void *threadid){
         pthread_cond_wait(&queueCount, &queueMutex);
     }
     pq.push(p); //add to queue
-    cout << "I'm a producer: " << producerId << " and I'm adding product: " << p.get_id() << " to the queue, now size: " << pq.size() << endl;
+    cout << "I'm a producer: " << producerId << " and I'm adding product: " << p.get_id() << " to the queue, now size: " << pq.size() << endl << flush;
     pthread_mutex_unlock(&queueMutex); //done insering into queue, release queue mutex
     pthread_cond_signal(&queueCount); //queue size has been increased, signal all waiting consumers
     pthread_mutex_unlock(&producerMutex); //release producer mutex so that during sleep other producers can execute
@@ -89,7 +92,7 @@ void *consumer0(void *threadid){
       dontcare = fn(10);              //run down the life of the product completely, dont care about the result
     }
     pConsumed++;                      //increase the number of total producers,
-    cout << "I'm Consumer: " << consumerID << " and I consumed product: " << currProduct.get_id() << endl;
+    cout << "I'm Consumer: " << consumerID << " and I consumed product: " << currProduct.get_id() << endl << flush;
     //DELETE PRODUCT?????
     pthread_mutex_unlock(&consumerMutex); //release the consumer mutex so that other consumers can begin consuming
     usleep(100000);
@@ -102,7 +105,48 @@ void *consumer0(void *threadid){
 
 
 void *consumer1(void *threadid){
-//round robin
+  int consumerID = (intptr_t)threadid;
+  pthread_mutex_lock(&consumerMutex);
+  while(pConsumed < totProducts){
+    pthread_mutex_lock(&queueMutex);
+    while(pq.size() == 0){
+      pthread_cond_wait(&queueCount, &queueMutex);
+    }
+    Product *currProduct = &(pq.front());
+    pthread_mutex_unlock(&queueMutex);
+
+    if(gQuantum < currProduct->get_life()){
+      for(int i = 0; i < gQuantum; i++){
+        int dontcare = fn(10);
+      }
+      currProduct->sub_life(gQuantum);
+
+      cout << "Consumer: " << consumerID << " consumed " << gQuantum << " life of product " << currProduct->get_id() << " life left "<< currProduct->get_life()<< endl << flush;
+    }
+    else {
+      for(int i = 0; i < currProduct->get_life(); i++){
+        int dontcare = fn(10);
+      }
+      cout << "Consumer: " << consumerID << " consumed " << currProduct->get_life() << " life of product " << currProduct->get_id() << endl << flush;
+      cout << "Product: " << currProduct->get_id() << " completed" << endl << flush;
+      pthread_mutex_lock(&queueMutex);
+      pq.pop();
+      pthread_cond_signal(&queueCount);
+      pthread_mutex_unlock(&queueMutex);
+
+      pConsumed++;
+    }
+    consumerCountID++;
+    if(consumerCountID == totalConsumers){
+      consumerCountID = 0;
+    }
+
+    pthread_mutex_unlock(&consumerMutex);
+    usleep(100000);
+    pthread_mutex_lock(&consumerMutex);
+  }
+  pthread_mutex_unlock(&consumerMutex);
+  pthread_exit(NULL);
 }
 
 
@@ -174,7 +218,9 @@ int main(int argc,char* argv[]){
 
   /*Set the seed of all random numbers in the program*/
   srand(seed);
+  gQuantum = quantum;
   gQSize = qSize;
+  totalConsumers = numCons;
   /* Creating Producers based on Param2*/
   pthread_t pThreads[numProducer];
   int rc;
