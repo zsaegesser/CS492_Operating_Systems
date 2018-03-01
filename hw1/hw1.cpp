@@ -10,18 +10,19 @@ using namespace std;
 
 //global condition variables & mutexes
 pthread_cond_t queueCount;
-pthread_mutex_t pidMutex;   //used for making ensuring only one thread accessing pid at once
+//pthread_mutex_t pidMutex;   //used for making ensuring only one thread accessing pid at once
 pthread_mutex_t producerMutex; //used to ensure FCFS in producers
 pthread_mutex_t queueMutex; //used for protecting insertion and poping of the queue
 pthread_mutex_t consumerMutex;
 
+
 /* Super special critical section stuff */
 int pidCount = 0; //pid count for creating new product id's
 std::queue<Product> pq; // Product Queue with no fixed size
-int totProducts;
 int pConsumed =0;
 // Global variables
 int gQSize;
+int totProducts;
 
 
 int fn(int n){
@@ -44,7 +45,7 @@ void *producer(void *threadid){
 
   //mutex protected
   pthread_mutex_lock(&producerMutex);
-  while(pidCount != totProducts){ //access pidCount inside pidMutex
+  while(pidCount != totProducts){ //access pidCount inside producerMutex
     productId = pidCount;
     pidCount++;
 
@@ -73,26 +74,26 @@ void *producer(void *threadid){
 void *consumer0(void *threadid){
 
   int consumerID = (intptr_t)threadid;
-  pthread_mutex_lock(&consumerMutex);
-  while(pConsumed < totProducts){
-    pthread_mutex_lock(&queueMutex);
-    while(pq.size() == 0){
+  pthread_mutex_lock(&consumerMutex); //acqure the consumer mutex to ensure only one consumer executing at a time
+  while(pConsumed < totProducts){     //continue consuming products until consumed total amount of products
+    pthread_mutex_lock(&queueMutex);  //acqure queue mutex to ensure only one thread (consumer or producer) is accessing the queue at once
+    while(pq.size() == 0){            //conditional wait, if the queue is empty, then wait to be signaled by the producers when a product is added
       pthread_cond_wait(&queueCount, &queueMutex);
     }
-    Product currProduct = pq.front();
-    pq.pop();
-    pthread_mutex_unlock(&queueMutex);
-    pthread_cond_signal(&queueCount);
+    Product currProduct = pq.front(); //get the product at the front of the queue (at this point we are guarenteed there will be a product in the queue)
+    pq.pop();                         //remove the first item in the queue, front only retrieves, doesnt pop
+    pthread_mutex_unlock(&queueMutex);//done with queue manipulation, release it so a producer may now add to the queue
+    pthread_cond_signal(&queueCount); //signal any producers waiting on a full queue that the queue is no longer full
     int dontcare = 0;
     for(int i = 0; i < currProduct.get_life(); i++){
-      dontcare = fn(10);
+      dontcare = fn(10);              //run down the life of the product completely, dont care about the result
     }
-    pConsumed++;
+    pConsumed++;                      //increase the number of total producers,
     cout << "I'm Consumer: " << consumerID << " and I consumed product: " << currProduct.get_id() << endl;
     //DELETE PRODUCT?????
-    pthread_mutex_unlock(&consumerMutex);
+    pthread_mutex_unlock(&consumerMutex); //release the consumer mutex so that other consumers can begin consuming
     usleep(100000);
-    pthread_mutex_lock(&consumerMutex);
+    pthread_mutex_lock(&consumerMutex);   //acqure the consumer mutex to ensure the FCFS scheduling
   }
   pthread_mutex_unlock(&consumerMutex);
   pthread_exit(NULL);
@@ -100,9 +101,12 @@ void *consumer0(void *threadid){
 
 
 
-void *Consumer1(){
+void *consumer1(void *threadid){
 //round robin
 }
+
+
+
 int main(int argc,char* argv[]){
   int numCons = 0;        //Param1 Number of Consumer Threads
   int numProducer = 0;    //Param2 Number of Producer Threads
@@ -185,17 +189,35 @@ int main(int argc,char* argv[]){
 
   }
 
+  /*FCFS create threads consumers */
   pthread_t cThreads[numCons];
-  int rc2;
-  int i2;
-  for (i2 = 0; i2 < numCons; i2++){
-    rc2 = pthread_create(&cThreads[i2], NULL, consumer0, (void *)i2);
+  if(schedAlgo == 0){
+    int rc2;
+    int i2;
+    for (i2 = 0; i2 < numCons; i2++){
 
-    if (rc2) {
-      cout << "Error:unable to create thread," << rc2 << endl;
-      exit(-1);
+      rc2 = pthread_create(&cThreads[i2], NULL, consumer0, (void *)i2);
+
+      if (rc2) {
+        cout << "Error:unable to create thread," << rc2 << endl;
+        exit(-1);
+      }
+
     }
+  }
+  else if(schedAlgo == 1){ //Roud Robin create threads consumers
+    int rc2;
+    int i2;
+    for (i2 = 0; i2 < numCons; i2++){
 
+      rc2 = pthread_create(&cThreads[i2], NULL, consumer1, (void *)i2);
+
+      if (rc2) {
+        cout << "Error:unable to create thread," << rc2 << endl;
+        exit(-1);
+      }
+
+    }
   }
 
   pthread_exit(NULL);
