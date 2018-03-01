@@ -22,7 +22,7 @@ int totProducts;
 void *producer(void *threadid){
   int producerId;
   int  productId;
-  producerId = (int)threadid;
+  producerId = (intptr_t)threadid;
 
   //mutex protected access to global pidCount
   pthread_mutex_lock(&pidMutex);
