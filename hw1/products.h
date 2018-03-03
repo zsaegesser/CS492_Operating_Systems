@@ -1,5 +1,6 @@
 #include <iostream>
-#include <time.h>
+#include <sys/time.h>
+#include <chrono>
 #include <cstdlib>
 
 using namespace std;
@@ -7,14 +8,13 @@ using namespace std;
 
 class Product {
     int id;
-    time_t timestamp;
+    double timestamp;
     int life;
-
   public:
     Product (int);
     Product (int, time_t, int);
     int get_id() {return id;}
-    time_t get_time_stamp() {return timestamp;}
+    double get_time_stamp() {return timestamp;}
     int get_life() {return life;}
     bool check_sub(int);
     void sub_life(int);
@@ -22,13 +22,18 @@ class Product {
 /*Normal constructor, takes in an id and creates the other values*/
 Product::Product (int newid){
   id = newid;
-  timestamp = time(&timestamp);
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  double t1=tv.tv_sec+(tv.tv_usec/1000000.0);
+  timestamp = t1;
   life = rand() % 1024;
 }
 /*testing constructor*/
-Product::Product (int newid, time_t newtime, int newlife){
+Product::Product (int newid, clock_t newtime, int newlife){
   id = newid;
-  timestamp = newtime;
+  // struct timeval tv;
+  // gettimeofday(&tv, NULL);
+  // timestamp = (tv.tv_usec)/1000;
   life = newlife;
 }
 /*Return TRUE if calling taken would eliminate the life of the product, false otherwise*/
@@ -42,7 +47,6 @@ bool Product::check_sub(int taken){
 void Product::sub_life(int taken){
   life = life-taken;
 }
-
 // int main(){
 //   srand(1);
 //   Product test1 (1);

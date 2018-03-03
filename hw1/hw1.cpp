@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <queue>
+#include <ctime>
+#include <chrono>
+#include <sys/time.h>
 #include "products.h"
 using namespace std;
 
@@ -26,6 +29,11 @@ int gQSize;
 int totProducts;
 int gQuantum;
 int totalConsumers;
+bool gTestFlag;
+//timing
+struct timeval tv;
+double start;
+
 
 
 int fn(int n){
@@ -59,7 +67,9 @@ void *producer(void *threadid){
         pthread_cond_wait(&queueCount, &queueMutex);
     }
     pq.push(p); //add to queue
-    cout << "I'm a producer: " << producerId << " and I'm adding product: " << p.get_id() << " to the queue, now size: " << pq.size() << endl << flush;
+    if(!gTestFlag){
+      cout << "I'm a producer: " << producerId << " and I'm adding product: " << p.get_id() << " to the queue, now size: " << pq.size() << endl << flush;
+    }
     pthread_mutex_unlock(&queueMutex); //done insering into queue, release queue mutex
     pthread_cond_signal(&queueCount); //queue size has been increased, signal all waiting consumers
     pthread_mutex_unlock(&producerMutex); //release producer mutex so that during sleep other producers can execute
@@ -92,7 +102,9 @@ void *consumer0(void *threadid){
       dontcare = fn(10);              //run down the life of the product completely, dont care about the result
     }
     pConsumed++;                      //increase the number of total producers,
-    cout << "I'm Consumer: " << consumerID << " and I consumed product: " << currProduct.get_id() << endl << flush;
+    if(!gTestFlag){
+      cout << "I'm Consumer: " << consumerID << " and I consumed product: " << currProduct.get_id() << endl << flush;
+    }
     //DELETE PRODUCT?????
     pthread_mutex_unlock(&consumerMutex); //release the consumer mutex so that other consumers can begin consuming
     usleep(100000);
@@ -114,26 +126,54 @@ void *consumer1(void *threadid){
     }
     Product *currProduct = &(pq.front());
     pthread_mutex_unlock(&queueMutex);
-
+    if(gTestFlag){
+      gettimeofday(&tv, NULL);
+      double t1=tv.tv_sec+(tv.tv_usec/1000000.0);
+      cout << "0," << currProduct->get_id() << "," << 1000*(t1-start) << "\n" << flush;
+    }
     if(gQuantum < currProduct->get_life()){
       for(int i = 0; i < gQuantum; i++){
         int dontcare = fn(10);
       }
       currProduct->sub_life(gQuantum);
+      if(!gTestFlag){
+        cout << "Consumer: " << consumerID << " consumed " << gQuantum << " life of product " << currProduct->get_id() << " life left "<< currProduct->get_life()<< endl << flush;
+      }
+      else {
+        gettimeofday(&tv, NULL);
+        double t1=tv.tv_sec+(tv.tv_usec/1000000.0);
+        cout << "1," << currProduct->get_id() << "," << 1000*(t1-start) << "\n" << flush;
 
-      cout << "Consumer: " << consumerID << " consumed " << gQuantum << " life of product " << currProduct->get_id() << " life left "<< currProduct->get_life()<< endl << flush;
+      }
     }
     else {
+      if(gTestFlag){
+        gettimeofday(&tv, NULL);
+        double t1=tv.tv_sec+(tv.tv_usec/1000000.0);
+        cout << "0," << currProduct->get_id() << "," << 1000*(t1-start) << "\n" << flush;
+      }
       for(int i = 0; i < currProduct->get_life(); i++){
         int dontcare = fn(10);
       }
-      cout << "Consumer: " << consumerID << " consumed " << currProduct->get_life() << " life of product " << currProduct->get_id() << endl << flush;
-      cout << "Product: " << currProduct->get_id() << " completed" << endl << flush;
+      if(gTestFlag){
+        gettimeofday(&tv, NULL);
+        double t1=tv.tv_sec+(tv.tv_usec/1000000.0);
+        cout << "1," << currProduct->get_id() << "," << 1000*(t1-start) << "\n" << flush;
+      }
+      if(!gTestFlag){
+        cout << "Consumer: " << consumerID << " consumed " << currProduct->get_life() << " life of product " << currProduct->get_id() << endl << flush;
+        cout << "Product: " << currProduct->get_id() << " completed" << endl << flush;
+      }
+      else {
+        gettimeofday(&tv, NULL);
+        double t1=tv.tv_sec+(tv.tv_usec/1000000.0);
+        double prodStart = currProduct->get_time_stamp();
+        cout << "2,"<< currProduct->get_id() << "," << 1000*(prodStart-start) << "," << 1000*(t1-start) << "\n" << flush;
+      }
       pthread_mutex_lock(&queueMutex);
       pq.pop();
       pthread_cond_signal(&queueCount);
       pthread_mutex_unlock(&queueMutex);
-
       pConsumed++;
     }
     consumerCountID++;
@@ -160,9 +200,18 @@ int main(int argc,char* argv[]){
   int quantum = 0;        //Param6 Quantum Value for RR algo
   int seed = 0;           //Param7 Seed for random num generation
 
-  if(argc != 8){
+  if(argc != 8 && argc !=9){
     cout << "Must Have all 7 arguments" << endl;
     return -1;
+  }
+  int testNum;
+  istringstream s8(argv[8]);
+  if(!(s8 >> testNum)){
+    cout << "Must have only 7 arguments" << endl;
+    return -1;
+  }
+  if(argc == 9 && testNum == 7){
+    gTestFlag = true;
   }
   /*string streams for all parameters*/
   istringstream s1(argv[1]);
@@ -215,7 +264,9 @@ int main(int argc,char* argv[]){
     return -1;
   }
   /*Error Checking done*/ // I think
-
+  struct timeval tim;
+  gettimeofday(&tim, NULL);
+  start = tim.tv_sec+(tim.tv_usec/1000000.0);
   /*Set the seed of all random numbers in the program*/
   srand(seed);
   gQuantum = quantum;
