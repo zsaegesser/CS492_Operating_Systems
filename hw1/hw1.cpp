@@ -81,7 +81,7 @@ void *producer(void *threadid){
   gettimeofday(&tv, NULL);
   double t1=tv.tv_sec+(tv.tv_usec/1000000.0);
   ptCount = ((1000*(t1-start))-ptStart)/totProducts;
-  cout << " PRODUCER THROGHPUT: " << 1000*(t1-start) << endl << flush;
+  cout << " PRODUCER THROGHPUT: " << ptCount << endl << flush;
   pthread_mutex_unlock(&producerMutex); //done, release everything so other producer threads can exit
 
   pthread_exit(NULL); //exit
