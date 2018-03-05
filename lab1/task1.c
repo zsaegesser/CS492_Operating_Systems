@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <errno.h>
+#include <deque>
 
 #define NUMP 5
 
@@ -26,7 +27,7 @@ int main()
   }
   for (i=0;i<NUMP;i++)
     pthread_join(diner_thread[i],NULL);
-
+    pthread_exit(NULL);
   for (i=0;i<NUMP;i++)
     pthread_mutex_destroy(&fork_mutex[i]);
 

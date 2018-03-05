@@ -27,6 +27,10 @@ int gQSize;
 int totProducts;
 int gQuantum;
 int totalConsumers;
+double ptCount; //Throughput timer counters for testing
+double ptStart;
+double ctCount;
+double ctStart;
 bool gTestFlag;
 //timing
 struct timeval tv;
@@ -74,6 +78,10 @@ void *producer(void *threadid){
     usleep(100000);
     pthread_mutex_lock(&producerMutex); // protects pidCount
   }
+  gettimeofday(&tv, NULL);
+  double t1=tv.tv_sec+(tv.tv_usec/1000000.0);
+  ptCount = ((1000*(t1-start))-ptStart)/totProducts;
+  cout << " PRODUCER THROGHPUT: " << 1000*(t1-start) << endl << flush;
   pthread_mutex_unlock(&producerMutex); //done, release everything so other producer threads can exit
 
   pthread_exit(NULL); //exit
@@ -108,6 +116,10 @@ void *consumer0(void *threadid){
     usleep(100000);
     pthread_mutex_lock(&consumerMutex);   //acqure the consumer mutex to ensure the FCFS scheduling
   }
+  gettimeofday(&tv, NULL);
+  double t1=tv.tv_sec+(tv.tv_usec/1000000.0);
+  ctCount = ((1000*(t1-start))-ctStart)/totalConsumers;
+  cout << "CONSUMER THROUGHPUT: " << ctCount << endl << flush;
   pthread_mutex_unlock(&consumerMutex);
   pthread_exit(NULL);
 }
@@ -178,11 +190,14 @@ void *consumer1(void *threadid){
     if(consumerCountID == totalConsumers){
       consumerCountID = 0;
     }
-
     pthread_mutex_unlock(&consumerMutex);
     usleep(100000);
     pthread_mutex_lock(&consumerMutex);
   }
+  gettimeofday(&tv, NULL);
+  double t1=tv.tv_sec+(tv.tv_usec/1000000.0);
+  ctCount = ((1000*(t1-start))-ctStart)/totalConsumers;
+  cout << "CONSUMER THROUGHPUT: " << ctCount << endl << flush;
   pthread_mutex_unlock(&consumerMutex);
   pthread_exit(NULL);
 }
@@ -283,6 +298,10 @@ int main(int argc,char* argv[]){
   pthread_t pThreads[numProducer];
   int rc;
   int i;
+  gettimeofday(&tv, NULL);
+  double st=tv.tv_sec+(tv.tv_usec/1000000.0);//For finding producer throughput (producer start time)
+  ptStart= 1000*(st-start);
+
   for (i = 0; i < numProducer; i++){
     rc = pthread_create(&pThreads[i], NULL, producer, (void *)i);
 
@@ -292,8 +311,12 @@ int main(int argc,char* argv[]){
     }
 
   }
-  /*FCFS create threads consumers */
+
   pthread_t cThreads[numCons];
+  gettimeofday(&tv, NULL);
+  double ct=tv.tv_sec+(tv.tv_usec/1000000.0);//For finding consumer throughput (approximate consumer start time)
+  ctStart= 1000*(ct-start);
+
   if(schedAlgo == 0){
     int rc2;
     int i2;
@@ -324,8 +347,6 @@ int main(int argc,char* argv[]){
   }
 
   pthread_exit(NULL);
-
-
 
   return 0;
 }
