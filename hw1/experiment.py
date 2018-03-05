@@ -32,13 +32,10 @@ for i in np.arange(200, 1100, 100, dtype=int):
     for j in range(5):
         print("Executing quantum = ", i, "j = ", j)
         start = time.time()
-        # responce = str(os.system('./hw1 4 4 100 30 1 '+str(i)+' '+str(random.randint(1,300))+' 7'))
         responce = subprocess.run(['./hw1','50','50','5000','100','1', str(i), str(random.randint(1,300)),'7'], stdout=subprocess.PIPE)
         end = time.time()
         print("Finished executing quantum = ", i, "j = ", j)
         print("Analyzing Responce...")
-        # print("The responce was: ", responce.stdout)
-        #print(responce.stdout.decode('utf-8'))
         currwait, currturn = responceAnalysis(responce.stdout.decode('utf-8'), 5000, 1000*(start-end))
         tempwaits = np.append(waits, (start-end)-currwait)
         tempturns = np.append(turns, currturn)

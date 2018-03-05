@@ -50,7 +50,7 @@ FCFS Algorithm using Mutex to ensure only one producer is creating a Product at 
 */
 void *producer(void *threadid){
   int producerId;
-  int  productId;
+  int productId;
   producerId = (intptr_t)threadid;
 
 
@@ -192,6 +192,7 @@ void *consumer1(void *threadid){
 
 
 int main(int argc,char* argv[]){
+
   int numCons = 0;        //Param1 Number of Consumer Threads
   int numProducer = 0;    //Param2 Number of Producer Threads
   int totalProducts = 0;  //Param3 Number of Total Products to be produced and consumed
@@ -204,14 +205,22 @@ int main(int argc,char* argv[]){
     cout << "Must Have all 7 arguments" << endl;
     return -1;
   }
-  int testNum;
-  istringstream s8(argv[8]);
-  if(!(s8 >> testNum)){
-    cout << "Must have only 7 arguments" << endl;
-    return -1;
+  if(argc == 9){
+    int testNum;
+    istringstream s8(argv[8]);
+    if(!(s8 >> testNum)){
+      cout << "Must have only 7 arguments" << endl;
+      return -1;
+    }
+    if(testNum == 7){
+        gTestFlag = true;
+    }
+    else{
+      cout << "Bad arguments" << endl;
+    }
   }
-  if(argc == 9 && testNum == 7){
-    gTestFlag = true;
+  else{
+    gTestFlag =false;
   }
   /*string streams for all parameters*/
   istringstream s1(argv[1]);
@@ -285,7 +294,6 @@ int main(int argc,char* argv[]){
     }
 
   }
-
   /*FCFS create threads consumers */
   pthread_t cThreads[numCons];
   if(schedAlgo == 0){
