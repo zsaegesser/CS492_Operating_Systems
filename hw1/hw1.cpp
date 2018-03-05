@@ -5,8 +5,6 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <queue>
-#include <ctime>
-#include <chrono>
 #include <sys/time.h>
 #include "products.h"
 using namespace std;
