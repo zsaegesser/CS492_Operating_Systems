@@ -86,6 +86,60 @@ I'm Consumer: 8 and I consumed product: 18
 I'm Consumer: 9 and I consumed product: 19
 ~~~
 
+1. 3 at low quantum value low product
+5 5 10 10 1 10 10
+  * Producer Throughput:
+    10.1568
+    10.1783
+    10.148
+  * FCFS Throughput:
+    10.148
+    10.2113
+    10.1638
+  * RR Throughput:
+    540.672
+    540.952
+    540.926
+2. 3 high quantum low products
+  10 10 10 10 1 5000 10
+  * Producer Throughput:
+    10.2221
+    10.1807
+    10.2256
+  * FCFS Throughput:
+    unchanged
+  * RR Throughput:
+   10.177
+   10.2132
+   10.2413
+
+3. 3 low quantum high product
+  10 10 100 10 1 10 10
+  * Producer Throughput:
+    439.769
+    439.638
+    439.727
+  * FCFS Throughput:
+    100.38
+    100.431
+    100.419
+  * RR Throughput:
+    4858.28
+    4857.2
+    4857.83
+4. 3 high product high quantum
+  * Producer Throughput:
+    10.0358
+    10.035
+    10.0423
+  * FCFS Throughput:
+
+  * RR Throughput:
+  100.4
+  100.477
+  100.477
+
+
 ## NEXT STEPS
 Create the Consumer RR algo, the hard part.
 
