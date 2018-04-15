@@ -47,9 +47,9 @@ void fifo_lru(pair<int,int> pageID) {
   main_memory[min_i] = pageID;
 
   //validate & time new page
-    all_procs[pageID.first].page_table[pageID.second].valid_bit = 1;
-    all_procs[pageID.first].page_table[pageID.second].timestamp = count;
-    count++;
+  all_procs[pageID.first].page_table[pageID.second].valid_bit = 1;
+  all_procs[pageID.first].page_table[pageID.second].timestamp = count;
+  count++;
 }
 
 //Function to find next contiguous page for pre-paging
@@ -63,7 +63,8 @@ pair <int,int> next_contiguous(pair <int,int> page_id){
       return all_procs[pid].page_table[i].page_id;
     }
   }
-
+  //sentinal value
+  return page_id;
 }
 
 int main ( int argc, char *argv[] ){
@@ -124,10 +125,9 @@ int main ( int argc, char *argv[] ){
   if (plist.is_open())
   {
       int i=0;
-      while ( plist>>pID>>totalMemory)
+      while (plist>>pID>>totalMemory)
       {
         //Create page table for each process in plist
-        //all_tables.push_back(createTable(pID,totalMemory,page_size));
         Process p;
         p.pid=i;
         p.createTable(pID,totalMemory,page_size);
@@ -158,21 +158,20 @@ int main ( int argc, char *argv[] ){
       // if (all_procs[i].page_table[j].timestamp == 0) {
       //   all_procs[i].page_table[j].timestamp = count;
       // }
+
+      //this sets main meomry up with increasing timestamps to emulate a real system
+      // that would take time to load each page
       all_procs[i].page_table[j].timestamp = count;
-      count++;
+      count++; //if we wanted to have them all load at the same "time" we wouldn't increase the counter
     }
   }
 
   // Part 2: Implement three different page replacement algorithms
-  // pair<int,int> test = make_pair(0,26);
-  // pair<int,int> test2 = make_pair(0,27);
-  // lru(test);
-  // lru(test2);
 
   //Read from ptrace and swap pages
   pID=0; //process ID
   int mem_loc; //memory location to be run
-  pair<int,int> next; //next contiguous page
+  pair<int,int> next; // contiguous page
   ifstream ptrace(argv[2]);
   if (ptrace.is_open())
   {
@@ -197,23 +196,23 @@ int main ( int argc, char *argv[] ){
           //if no, PAGE FAULT!
             //add page fault!
 
-            //run fifo_lru
+
           if (page_algo == 1 || page_algo == 2) {
             fifo_lru(pageID);
             swapcount++;
             if (pre_flag) { //prepaging
               next = next_contiguous(pageID);
-              std::cout << next.second << '\n';
-              fifo_lru(next);
-              swapcount++;
+              //if next equaled pageID that means there was no contiguous found
+              if(next != pageID){
+                std::cout << next.second << '\n';
+                fifo_lru(next);
+                swapcount++;
+              }
             }
           }
-
           std::cout << "PAGE FAULT BABY" << '\n';
         }
         std::cin.ignore();
-
-
       }
       ptrace.close();
   }
