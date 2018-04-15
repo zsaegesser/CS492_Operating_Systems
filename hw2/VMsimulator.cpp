@@ -16,21 +16,24 @@ std::vector<pair<int,int> > main_memory;
 //Vector of Processes from plist
 std::vector<Process> all_procs;
 
+//total number of swaps performed to measure performance
+int swapcount = 0;
+
 //Global counter used to check access time for pages in main memory
 int count = 1;
 
 
-
-void fifo(pair<int,int> pageID) {
+//Funtion to complete fifo or lru depending on what is being stored in page
+void fifo_lru(pair<int,int> pageID) {
   //find oldest page
-  int min = all_procs[main_memory[0].first].page_table[main_memory[0].second].last_accessed;
+  int min = all_procs[main_memory[0].first].page_table[main_memory[0].second].timestamp;
   int min_i;
   for (size_t i = 1; i < main_memory.size(); i++) {
     int pid = main_memory[i].first;
     int page_num = main_memory[i].second;
-    //std::cout << all_procs[pid].page_table[page_num].last_accessed << '\n';
-    if (all_procs[pid].page_table[page_num].last_accessed <= min) {
-      min = all_procs[pid].page_table[page_num].last_accessed;
+    //std::cout << all_procs[pid].page_table[page_num].timestamp << '\n';
+    if (all_procs[pid].page_table[page_num].timestamp <= min) {
+      min = all_procs[pid].page_table[page_num].timestamp;
       min_i = i;
     }
   }
@@ -45,14 +48,27 @@ void fifo(pair<int,int> pageID) {
 
   //validate & time new page
     all_procs[pageID.first].page_table[pageID.second].valid_bit = 1;
-    all_procs[pageID.first].page_table[pageID.second].last_accessed = count;
+    all_procs[pageID.first].page_table[pageID.second].timestamp = count;
+    count++;
+}
 
-  //std::cout << min_i << '\n';
+//Function to find next contiguous page for pre-paging
+pair <int,int> next_contiguous(pair <int,int> page_id){
+  int pid = page_id.first;
+  int page_loc = page_id.second;
+  //iterate through page table starting at pair with given page_id
+  //return next non valid page id
+  for (size_t i = page_loc+1; i < all_procs[pid].page_table.size(); i++) {
+    if (!all_procs[pid].page_table[i].valid_bit) {
+      return all_procs[pid].page_table[i].page_id;
+    }
+  }
+
 }
 
 int main ( int argc, char *argv[] ){
-  FILE * plist;
-  FILE * ptrace;
+  FILE * eplist;
+  FILE * eptrace;
   int page_size;
   int page_algo;
   bool pre_flag;
@@ -61,11 +77,11 @@ int main ( int argc, char *argv[] ){
   if ( argc != 6)
     cout<<"usage: "<< argv[0] <<" <plist> <ptrace> <page size> <page algorithm> <Pre-page flag +/->\n"; //update
   else {
-    plist = fopen(argv[1],"r");
-    ptrace = fopen(argv[2],"r");
+    eplist = fopen(argv[1],"r");
+    eptrace = fopen(argv[2],"r");
     //Check Files exist
-    if (plist == NULL) perror ("Error opening <plist>");
-    if (ptrace == NULL) perror ("Error opening <ptrace>");
+    if (eplist == NULL) perror ("Error opening <plist>");
+    if (eptrace == NULL) perror ("Error opening <ptrace>");
 
     page_size = atoi(argv[3]);
     if (page_size == 0) { //atoi turns anything other than an int to 0
@@ -104,11 +120,11 @@ int main ( int argc, char *argv[] ){
   //Read from plist and create pages / tables
   int pID; //process ID
   int totalMemory; //Total Memory accessed by process
-  ifstream myfile(argv[1]);
-  if (myfile.is_open())
+  ifstream plist(argv[1]); //nvm on fopen()
+  if (plist.is_open())
   {
       int i=0;
-      while ( myfile>>pID>>totalMemory)
+      while ( plist>>pID>>totalMemory)
       {
         //Create page table for each process in plist
         //all_tables.push_back(createTable(pID,totalMemory,page_size));
@@ -118,7 +134,7 @@ int main ( int argc, char *argv[] ){
         all_procs.push_back(p);
         i++;
       }
-      myfile.close();
+      plist.close();
   }
 
   //DEFAULT LOADING OF MAIN MEMORY:
@@ -138,22 +154,78 @@ int main ( int argc, char *argv[] ){
 
       //toggle valid bit in pages and add to timer
       all_procs[i].page_table[j].valid_bit = 1;
-      all_procs[i].page_table[j].last_accessed = count;
+      //make sure pages with timestamp 0 stay zero (so you don't check unused memory)
+      // if (all_procs[i].page_table[j].timestamp == 0) {
+      //   all_procs[i].page_table[j].timestamp = count;
+      // }
+      all_procs[i].page_table[j].timestamp = count;
       count++;
     }
   }
 
   // Part 2: Implement three different page replacement algorithms
-  pair<int,int> test = make_pair(0,26);
-  fifo(test);
+  // pair<int,int> test = make_pair(0,26);
+  // pair<int,int> test2 = make_pair(0,27);
+  // lru(test);
+  // lru(test2);
+
+  //Read from ptrace and swap pages
+  pID=0; //process ID
+  int mem_loc; //memory location to be run
+  pair<int,int> next; //next contiguous page
+  ifstream ptrace(argv[2]);
+  if (ptrace.is_open())
+  {
+      int i=0;
+      while ( ptrace>>pID>>mem_loc)
+      {
+        mem_loc = mem_loc - 1; //We made our pages start from 0 where ptrace starts at 1
+        pair<int,int> pageID = make_pair(pID,mem_loc/page_size); //page containing read location
+        std::cout << pID << " "<< mem_loc << " " << mem_loc/page_size << '\n';
+
+
+        //check if page containing memory location has valid valid_bit
+        if (all_procs[pID].page_table[mem_loc/page_size].valid_bit) {
+          //Our page timestamp could represent access time or swap time
+            //if it is lru this condition makes it access time.
+          if (page_algo == 2) {
+            all_procs[pID].page_table[mem_loc/page_size].timestamp = count;
+            count++;
+          }
+          std::cout << "IN THER" << '\n';
+        }else{
+          //if no, PAGE FAULT!
+            //add page fault!
+
+            //run fifo_lru
+          if (page_algo == 1 || page_algo == 2) {
+            fifo_lru(pageID);
+            swapcount++;
+            if (pre_flag) { //prepaging
+              next = next_contiguous(pageID);
+              std::cout << next.second << '\n';
+              fifo_lru(next);
+              swapcount++;
+            }
+          }
+
+          std::cout << "PAGE FAULT BABY" << '\n';
+        }
+        std::cin.ignore();
+
+
+      }
+      ptrace.close();
+  }
 
   //Testing Printout:
-  for (size_t i = 0; i < proc_count; i++) {
-    all_procs[i].printout();
-  }
-  // for (size_t i = 0; i < main_memory.size(); i++) {
-  //   std::cout << i << ": (" << main_memory[i].first << "," << main_memory[i].second << ") "<< all_procs[main_memory[i].first].page_table[main_memory[i].second].last_accessed << '\n';
+  // for (size_t i = 0; i < proc_count; i++) {
+  //   all_procs[i].printout();
   // }
+  // for (size_t i = 0; i < main_memory.size(); i++) {
+  //   std::cout << i << ": (" << main_memory[i].first << '\n';
+  // }
+  //std::cout << swapcount << '\n';
 
 
 

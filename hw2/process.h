@@ -3,7 +3,7 @@
 struct page {
   std::pair<int,int> page_id;
   bool valid_bit;
-  int last_accessed;
+  int timestamp;
 };
 
 class Process{
@@ -17,7 +17,7 @@ public:
     int i = 0;
     for (size_t i = 0; i < page_table.size(); i++) {
       int second = page_table[i].page_id.second;
-      int t = page_table[i].last_accessed;
+      int t = page_table[i].timestamp;
       if (second <10) {
         std::cout << second << ":" << t << "  " << "|";
       }else if (second < 100) {
@@ -43,7 +43,7 @@ public:
       t.page_id.first = pID;
       t.page_id.second = i; // pairs a good naming scheme?
       t.valid_bit = 0; //not sure yet
-      t.last_accessed = 0; //start with 0?
+      t.timestamp = 0;
       result.push_back(t);
     }
     page_table = result;
