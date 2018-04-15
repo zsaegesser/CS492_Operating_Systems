@@ -11,3 +11,11 @@ I have done the argument parsing and some error checking and now I'm getting int
 * Implement a variable page size
 * Implement demand/pre-paging
 * Record page swaps during a run
+
+
+## Print Format
+Page Swaps: ####
+
+("Page"+ space + "Swaps:" +space + the_number)
+#### example
+Page Swaps: 123434
