@@ -16,36 +16,41 @@ std::vector<pair<int,int> > main_memory;
 //Vector of Processes from plist
 std::vector<Process> all_procs;
 
+long pagefault_count=0;
+
 //total number of swaps performed to measure performance
 int swapcount = 0;
 
 //Global counter used to check access time for pages in main memory
-int count = 1;
+long count = 1;
 
 
 //Funtion to complete fifo or lru depending on what is being stored in page
 void fifo_lru(pair<int,int> pageID) {
   //find oldest page
-  int min = all_procs[main_memory[0].first].page_table[main_memory[0].second].timestamp;
-  int min_i;
+  //std::cout << "1" << flush<<'\n';
+  long min = all_procs[main_memory[0].first].page_table[main_memory[0].second].timestamp;
+  int min_i=0;
   for (size_t i = 1; i < main_memory.size(); i++) {
+    //std::cout << "2" << flush<<'\n';
     int pid = main_memory[i].first;
     int page_num = main_memory[i].second;
     //std::cout << all_procs[pid].page_table[page_num].timestamp << '\n';
     if (all_procs[pid].page_table[page_num].timestamp <= min) {
+      //std::cout << "3" <<flush<< '\n';
       min = all_procs[pid].page_table[page_num].timestamp;
       min_i = i;
     }
   }
-
+  //std::cout << "4" << flush<<'\n';
   //swap oldest page
   if (min != 0) { //0 means it was intially unused
     all_procs[main_memory[min_i].first].page_table[main_memory[min_i].second].valid_bit = 0; //un-validate old page
   }
-
+  //std::cout << "5" << flush<<'\n';
   //put new page in main memory
   main_memory[min_i] = pageID;
-
+  //std::cout << "6" << flush<<'\n';
   //validate & time new page
   all_procs[pageID.first].page_table[pageID.second].valid_bit = 1;
   all_procs[pageID.first].page_table[pageID.second].timestamp = count;
@@ -58,8 +63,11 @@ pair <int,int> next_contiguous(pair <int,int> page_id){
   int page_loc = page_id.second;
   //iterate through page table starting at pair with given page_id
   //return next non valid page id
+
   for (size_t i = page_loc+1; i < all_procs[pid].page_table.size(); i++) {
+
     if (!all_procs[pid].page_table[i].valid_bit) {
+      //std::cout << all_procs[pid].page_table[i].page_id.second << flush << '\n';
       return all_procs[pid].page_table[i].page_id;
     }
   }
@@ -180,7 +188,7 @@ int main ( int argc, char *argv[] ){
       {
         mem_loc = mem_loc - 1; //We made our pages start from 0 where ptrace starts at 1
         pair<int,int> pageID = make_pair(pID,mem_loc/page_size); //page containing read location
-        std::cout << pID << " "<< mem_loc << " " << mem_loc/page_size << '\n';
+        //std::cout << pID << " "<< mem_loc << " " << mem_loc/page_size << '\n';
 
 
         //check if page containing memory location has valid valid_bit
@@ -188,31 +196,32 @@ int main ( int argc, char *argv[] ){
           //Our page timestamp could represent access time or swap time
             //if it is lru this condition makes it access time.
           if (page_algo == 2) {
+            std::cout << mem_loc << '\n';
             all_procs[pID].page_table[mem_loc/page_size].timestamp = count;
+
             count++;
           }
-          std::cout << "IN THER" << '\n';
+          //std::cout << "IN THER" << '\n';
         }else{
           //if no, PAGE FAULT!
-            //add page fault!
-
-
+          pagefault_count++;
           if (page_algo == 1 || page_algo == 2) {
             fifo_lru(pageID);
-            swapcount++;
+            //swapcount++;
             if (pre_flag) { //prepaging
               next = next_contiguous(pageID);
+              //std::cout << next.second << flush<<'\n';
               //if next equaled pageID that means there was no contiguous found
               if(next != pageID){
-                std::cout << next.second << '\n';
+                //std::cout << next.second << '\n';
                 fifo_lru(next);
-                swapcount++;
+                //swapcount++;
               }
             }
           }
-          std::cout << "PAGE FAULT BABY" << '\n';
+          //std::cout << "PAGE FAULT BABY" << '\n';
         }
-        std::cin.ignore();
+
       }
       ptrace.close();
   }
@@ -225,10 +234,10 @@ int main ( int argc, char *argv[] ){
   //   std::cout << i << ": (" << main_memory[i].first << '\n';
   // }
   //std::cout << swapcount << '\n';
+  std::cout << pagefault_count <<flush<< '\n';
 
+  return 1;
 
-
-  //TODO:
 
 
   // 2) Implement three different page replacement algorithms

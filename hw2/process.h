@@ -3,7 +3,7 @@
 struct page {
   std::pair<int,int> page_id;
   bool valid_bit;
-  int timestamp;
+  long timestamp;
 };
 
 class Process{
