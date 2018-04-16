@@ -6,6 +6,7 @@
 #include <fstream>
 #include <vector>
 #include "process.h"
+#include <math.h>
 
 using namespace std;
 
@@ -127,8 +128,8 @@ int main ( int argc, char *argv[] ){
   main_memory.resize(512/page_size);
 
   //Read from plist and create pages / tables
-  int pID; //process ID
-  int totalMemory; //Total Memory accessed by process
+  int pID=0; //process ID
+  int totalMemory=0; //Total Memory accessed by process
   ifstream plist(argv[1]); //nvm on fopen()
   if (plist.is_open())
   {
@@ -141,6 +142,7 @@ int main ( int argc, char *argv[] ){
         p.createTable(pID,totalMemory,page_size);
         all_procs.push_back(p);
         i++;
+        //std::cout << i << '\n';
       }
       plist.close();
   }
@@ -183,21 +185,20 @@ int main ( int argc, char *argv[] ){
   ifstream ptrace(argv[2]);
   if (ptrace.is_open())
   {
-      int i=0;
+
       while ( ptrace>>pID>>mem_loc)
       {
         mem_loc = mem_loc - 1; //We made our pages start from 0 where ptrace starts at 1
-        pair<int,int> pageID = make_pair(pID,mem_loc/page_size); //page containing read location
-        //std::cout << pID << " "<< mem_loc << " " << mem_loc/page_size << '\n';
-
+        pair<int,int> pageID = make_pair(pID,ceil(mem_loc/page_size)); //page containing read location
+        //std::cout << pID << " "<< mem_loc << " " << ceil(mem_loc/page_size) << '\n';
 
         //check if page containing memory location has valid valid_bit
-        if (all_procs[pID].page_table[mem_loc/page_size].valid_bit) {
+        if (all_procs[pID].page_table[ceil(mem_loc/page_size)].valid_bit) {
           //Our page timestamp could represent access time or swap time
             //if it is lru this condition makes it access time.
           if (page_algo == 2) {
-            std::cout << mem_loc << '\n';
-            all_procs[pID].page_table[mem_loc/page_size].timestamp = count;
+            //std::cout << mem_loc << '\n';
+            all_procs[pID].page_table[ceil(mem_loc/page_size)].timestamp = count;
 
             count++;
           }
