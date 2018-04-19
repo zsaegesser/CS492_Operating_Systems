@@ -17,7 +17,7 @@ int main(int argc, char * const argv[]){
   string dir_list_file;
   int disk_size = 0;
   int block_size = 0;
-  vector<char *> command_line_inputs;
+
 
   // Basic error checking, more for us to not make silly mistake
   if(argc != 9){
@@ -61,14 +61,17 @@ int main(int argc, char * const argv[]){
   while(true){
     char input[128]; //input char array
     cin.getline(input, 128); //get input from user
+    vector<char *> command_line_inputs;
 
-    //
+    //quit now if exit command
     if(strcmp(input, "exit") == 0){
       break;
     }
 
+    //split the input by spaces
     char * split = strtok(input, " ");
 
+    //go through the split input and save to a vector of char*'s
     while( split != NULL){
       command_line_inputs.push_back(split);
       split = strtok(NULL, " ");
@@ -105,7 +108,7 @@ int main(int argc, char * const argv[]){
       cout << "Hit dir" << endl;
       // dir();
     }
-    else if(strcmp(command_line_inputs, "prfiles") == 0){   //prfiles
+    else if(strcmp(command_line_inputs[0], "prfiles") == 0){   //prfiles
       cout << "Hit prfiles" << endl;
       // prfiles();
     }
@@ -116,11 +119,6 @@ int main(int argc, char * const argv[]){
     else {
       cout << "Command not recognized" << endl;
     }
-
-
-
-
-
 
   }
 
