@@ -13,7 +13,8 @@ public:
   std::vector<Node> children;
   bool type; //0 for directory, 1 for file
 
-  Node(char * node_name, int node_size, time_t node_timestamp){
+  Node(bool node_type, char * node_name, int node_size, time_t node_timestamp){
+    this.type = node_type;
     this.name = node_name;
     this.size = node_size;
     this.timestamp = node_timestamp;
