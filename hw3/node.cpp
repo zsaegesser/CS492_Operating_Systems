@@ -36,17 +36,24 @@ public:
 
   // called on root, given name of node you want
   Node find_node_by_name(char * search_name){
-    if(strcmp(name, search_name) == 0){
+    // cout << name << " " << search_name <<  endl;
+    if((strcmp(name, search_name) == 0)){
+      // cout << "got here" << name << endl;
       return *this;
     }
     else if(!children.empty()){
       for(int i = 0; i < children.size(); i++){
-        children[i]->find_node_by_name(search_name);
+        Node temp = children[i]->find_node_by_name(search_name);
+        if(strcmp(temp.name, search_name) == 0){
+          return temp;
+        }
       }
     }
     else{
+      time_t timer;
+      time(&timer);
       cout << "DIDNT FIND NODE" << endl;
-      return *this;
+      return Node(0,"", 0, timer);
     }
   }
 
@@ -90,8 +97,10 @@ int main(int argc, char * const argv[]){
   three.set_parent(&one);
   five.set_parent(&four);
   //
-  print_tree(root, 0);
+  // print_tree(root, 0);
 
+  Node temp = root.find_node_by_name("name/oaf");
+  cout << temp.name;
   return 0;
 
 }
