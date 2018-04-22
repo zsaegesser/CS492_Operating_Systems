@@ -6,8 +6,24 @@
 #include <cstdlib>
 #include <string.h>
 #include <vector>
+#include "node.h"
+#include <time.h>
 
 using namespace std;
+
+
+// std::vector<Node> v;
+
+
+void cd(char * directory){
+  // Node new_node = find_node_by_name(directory);
+  // if(is_some_child(curr_node, new_node)){
+  //   curr_node = new_node;
+  // }
+  cout << directory << endl;
+}
+
+
 
 
 int main(int argc, char * const argv[]){
@@ -78,7 +94,7 @@ int main(int argc, char * const argv[]){
     }
     if(strcmp(command_line_inputs[0], "cd") == 0){           //cd
       cout << "Hit cd" << endl;
-      //cd(command_line_inputs[1]);
+      cd(command_line_inputs[1]);
     }
     else if(strcmp(command_line_inputs[0], "ls") == 0){      //ls
       cout << "hit ls" << endl;

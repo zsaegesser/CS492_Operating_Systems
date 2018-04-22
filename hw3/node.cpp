@@ -18,6 +18,9 @@ public:
   std::vector<Node *> children;
   bool type; //0 for directory, 1 for file
 
+  Node(){
+    type = 0;
+  }
   Node(bool node_type, char * node_name, int node_size, time_t node_timestamp){
     type = node_type;
     name = node_name;
@@ -43,10 +46,10 @@ public:
     }
     else if(!children.empty()){
       for(int i = 0; i < children.size(); i++){
-        Node temp = children[i]->find_node_by_name(search_name);
-        if(strcmp(temp.name, search_name) == 0){
-          return temp;
-        }
+        return children[i]->find_node_by_name(search_name);
+        // if(strcmp(temp.name, search_name) == 0){
+        //   return temp;
+        // }
       }
     }
     else{
@@ -74,6 +77,27 @@ static void print_tree(Node &curr_node, int level){
   }
 }
 
+
+// is_some_child(a, b) => returns TRUE if a is a child of b, false otherwise
+bool is_some_child(Node test_node, Node curr_node){
+  std::vector<Node *> curr_children = curr_node.children;
+  for(int i =0; i < curr_children.size(); i++){
+    if(strcmp(test_node.name, curr_children[i]->name) == 0){
+      // cout << test_node.name << curr_children[i]->name << endl;
+      // cout << "Got here" << endl;
+      return true;
+    }
+  }
+  for(int i = 0; i < curr_children.size(); i++){
+    if(!curr_children[i]->children.empty()){
+      return is_some_child(test_node, *curr_children[i]);
+    }
+  }
+  return false;
+}
+
+
+
 int main(int argc, char * const argv[]){
   time_t timer;
   time(&timer);
@@ -98,9 +122,10 @@ int main(int argc, char * const argv[]){
   five.set_parent(&four);
   //
   // print_tree(root, 0);
-
-  Node temp = root.find_node_by_name("name/oaf");
-  cout << temp.name;
+  // print(is_some_child(root, one))
+  cout << is_some_child(five, four) << endl;
+  // Node temp = root.find_node_by_name("name");
+  // cout << temp.name;
   return 0;
 
 }
