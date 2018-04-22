@@ -8,11 +8,14 @@
 #include <vector>
 #include "node.h"
 #include <time.h>
+#include <fstream>
 
 using namespace std;
 
 
 // std::vector<Node> v;
+
+Node * root;
 
 
 void cd(char * directory){
@@ -29,8 +32,8 @@ void cd(char * directory){
 int main(int argc, char * const argv[]){
 
   // istringstream iss;
-  string file_list_file;
-  string dir_list_file;
+  int file_list_index;
+  int dir_list_index;
   int disk_size = 0;
   int block_size = 0;
 
@@ -45,12 +48,12 @@ int main(int argc, char * const argv[]){
   for(int i = 1; i<9; i+=2){
     string arg(argv[i]);
     if(arg.compare("-f") == 0){
-      string file_list(argv[i+1]);
-      file_list_file = file_list;
+      //string file_list(argv[i+1]);
+      file_list_index = i+1;
     }
     else if(arg.compare("-d") == 0){
-      string dir_list(argv[i+1]);
-      dir_list_file = dir_list;
+      //string dir_list(argv[i+1]);
+      dir_list_index = i+1;
     }
     else if(arg.compare("-s") == 0){
       disk_size = atoi(argv[i+1]);
@@ -70,7 +73,96 @@ int main(int argc, char * const argv[]){
   // cout << "Disk Size: " << disk_size << endl;
   // cout << "Block Size: " << block_size << endl;
 
-  //Do file stuff
+  //Read from Directory and File Lists to populate directory tree
+  string line ="";
+  ifstream dir_list(argv[dir_list_index]);
+  if (dir_list.is_open())
+  {
+      while (dir_list>>line) //find size of current directory name
+      {
+        // std::cout << line << '\n';
+        int i = line.length();
+        while (line[i] != '/') {
+          i--;
+        }
+        string parent = line.substr(0,i);
+        // if (parent.compare(".")==0) {
+        //   std::cout << "pfft" << '\n';
+        // }
+        // convert to char * for use with Node class
+        char *line_char = new char[line.length() + 1];
+        strcpy(line_char, line.c_str());
+        //std::cout << "LINE: "<< line_char << '\n';
+
+        char *parent_char = new char[parent.length() + 1];
+        strcpy(parent_char, parent.c_str());
+        // do stuff
+        time_t timer;
+        time(&timer);
+        //create new node
+        Node this_node = Node(0,line_char, 0, timer);
+
+        if (parent.compare(".")==0) { // if node is either root or first level
+          if (line.compare("./")==0) { // if node is root
+            //std::cout << "ROOT" << '\n';
+            this_node.set_parent(NULL);
+            root = &this_node;
+            continue;
+          }else{ //First level node
+            std::cout << "CURRENT: |" << line_char <<"|"<< '\n';
+            root->add_child(&this_node);
+            this_node.set_parent(root);
+            continue;
+          }
+          delete [] line_char;
+        }
+        //print_tree(*root,0);
+        std::cout << "CURRENT: |" << line_char <<"|"<< '\n';
+        std::cout << "CURRENT'S PARENT: |" << parent_char <<"|"<< '\n';
+        Node parent_node = root->find_node_by_name(parent_char);
+        //set it's parent
+        this_node.set_parent(&parent_node);
+        parent_node.add_child(&this_node);
+        //set it's parent's child
+        delete [] line_char;
+        delete [] parent_char;
+
+        //std::cout << "NEW NODE: \'" << line << "\' WITH PARENT: \'" << line.substr(0,i) << "\'" << flush << '\n';
+      }
+      dir_list.close();
+  }
+  //
+  // ifstream file_list(argv[file_list_index]);
+  // string one,two,three,four,five,six,seven,eight,nine,ten,eleven;
+  // if (file_list.is_open())
+  // {
+  //     while (file_list>>one>>two>>three>>four>>five>>six>>seven>>eight>>nine>>ten>>eleven)
+  //     {
+  //       //std::cout << eleven << '\n';
+  //       int i = eleven.length();
+  //       while (line[i] != '/') {
+  //         i--;
+  //       }
+  //       string parent = eleven.substr(0,i);
+  //       if (parent.compare(".")==0) {
+  //         std::cout << "first level" << '\n';
+  //       }
+  //       if (eleven.compare("./")==0) {
+  //         //root no parent
+  //         std::cout << "root beer" << '\n';
+  //       }
+  //
+  //       char *eleven_char = new char[eleven.length() + 1];
+  //       strcpy(eleven_char, eleven.c_str());
+  //       // do stuff
+  //       delete [] eleven_char;
+  //
+  //       // convert to char * for use with Node class
+  //       //std::cout << "NEW NODE: \'" << eleven << "\' WITH PARENT: \'" << eleven.substr(0,i) << "\'" << flush << '\n';
+  //     }
+  //     file_list.close();
+  // }
+  //print_tree(*root,0);
 
   //Open terminal stuff
 
@@ -82,6 +174,10 @@ int main(int argc, char * const argv[]){
     //quit now if exit command
     if(strcmp(input, "exit") == 0){
       break;
+    }
+    if(strcmp(input, "") == 0){
+      cout << "Not Valid Command" << endl;
+      continue;
     }
 
     //split the input by spaces
