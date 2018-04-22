@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstdlib>
+#include <cstring>
 
 using namespace std;
 
@@ -20,7 +21,9 @@ public:
 
   Node(bool node_type, char * node_name, int node_size, time_t node_timestamp){
     type = node_type;
-    name = node_name;
+    name = new char[strlen(node_name)];
+    strcpy(name, node_name);
+    // cout << name << endl;
     size = node_size;
     timestamp = node_timestamp;
   }
@@ -35,26 +38,29 @@ public:
   }
 
   // called on root, given name of node you want
-  Node find_node_by_name(char * search_name){
+  Node* find_node_by_name(char * search_name){
     // cout << name << " " << search_name <<  endl;
     if((strcmp(name, search_name) == 0)){
       // cout << "got here" << name << endl;
-      return *this;
+      return this;
     }
-    else if(!children.empty()){
+    // else if(!children.empty()){
       for(int i = 0; i < children.size(); i++){
-        return children[i]->find_node_by_name(search_name);
+        Node * p = children[i]->find_node_by_name(search_name);
+        if(p != NULL){
+          return p;
+        }
         // if(strcmp(temp.name, search_name) == 0){
         //   return temp;
         // }
       }
-    }
-    else{
-      time_t timer;
-      time(&timer);
-      cout << "DIDNT FIND NODE" << endl;
-      return Node(0,"", 0, timer);
-    }
+    // }
+    // else{
+      // time_t timer;
+      // time(&timer);
+      // cout << "DIDNT FIND NODE" << endl;
+      return NULL;
+    // }
   }
 
 

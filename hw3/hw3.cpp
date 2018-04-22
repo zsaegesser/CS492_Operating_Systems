@@ -13,9 +13,7 @@
 using namespace std;
 
 
-// std::vector<Node> v;
-
-Node * root;
+std::vector<Node> globals;
 
 
 void cd(char * directory){
@@ -37,7 +35,11 @@ int main(int argc, char * const argv[]){
   int disk_size = 0;
   int block_size = 0;
 
-
+  //initialize globals  ----REMEMBER TO DELETE
+  time_t timer;
+  time(&timer);
+  globals.push_back(Node(0, "", 0, timer));
+  globals.push_back(Node(0, "", 0, timer));
   // Basic error checking, more for us to not make silly mistake
   if(argc != 9){
     cout << "Wrong number of argumnets";
@@ -80,63 +82,76 @@ int main(int argc, char * const argv[]){
   {
       while (dir_list>>line) //find size of current directory name
       {
-        // std::cout << line << '\n';
         int i = line.length();
         while (line[i] != '/') {
           i--;
         }
         string parent = line.substr(0,i);
-        // if (parent.compare(".")==0) {
-        //   std::cout << "pfft" << '\n';
-        // }
+
         // convert to char * for use with Node class
         char *line_char = new char[line.length() + 1];
         strcpy(line_char, line.c_str());
-        //std::cout << "LINE: "<< line_char << '\n';
 
         char *parent_char = new char[parent.length() + 1];
         strcpy(parent_char, parent.c_str());
-        // do stuff
-        time_t timer;
-        time(&timer);
-        //create new node
-        Node this_node = Node(0,line_char, 0, timer);
+
 
         if (parent.compare(".")==0) { // if node is either root or first level
           if (line.compare("./")==0) { // if node is root
-            //std::cout << "ROOT" << '\n';
-            this_node.set_parent(NULL);
-            root = &this_node;
+            //create timestamp
+            time_t timer;
+            time(&timer);
+            //create root node
+            globals[0] = Node(0, line_char, 0, timer);
+            //set the roots parent
+            globals[0].set_parent(NULL);
+
             continue;
           }else{ //First level node
-            std::cout << "CURRENT: |" << line_char <<"|"<< '\n';
-            root->add_child(&this_node);
-            this_node.set_parent(root);
+            //create timer
+            time_t timer;
+            time(&timer);
+            //create new node
+            Node * temp_node = new Node(0, line_char, 0, timer);
+
+            //set parent of new node to the root
+            temp_node->set_parent(&globals[0]);
+            //add new node to child of root
+            globals[0].add_child(temp_node);
+
             continue;
           }
+          //delete the line char *
           delete [] line_char;
         }
-        //print_tree(*root,0);
-        std::cout << "CURRENT: |" << line_char <<"|"<< '\n';
-        std::cout << "CURRENT'S PARENT: |" << parent_char <<"|"<< '\n';
-        Node parent_node = root->find_node_by_name(parent_char);
+
+        //find the parent node of the current node adding
+        Node * parent_node = globals[0].find_node_by_name(parent_char);
+
+
+        time_t timer;
+        time(&timer);
+        Node * new_node = new Node(0, line_char, 0, timer);
+
+        //add child to the parent
+        parent_node->add_child(new_node);
         //set it's parent
-        this_node.set_parent(&parent_node);
-        parent_node.add_child(&this_node);
-        //set it's parent's child
+        new_node->set_parent(parent_node);
+
+        //delete all the char *
         delete [] line_char;
         delete [] parent_char;
-
-        //std::cout << "NEW NODE: \'" << line << "\' WITH PARENT: \'" << line.substr(0,i) << "\'" << flush << '\n';
       }
       dir_list.close();
   }
+
+
   //
   // ifstream file_list(argv[file_list_index]);
   // string one,two,three,four,five,six,seven,eight,nine,ten,eleven;
   // if (file_list.is_open())
   // {
-  //     while (file_list>>one>>two>>three>>four>>five>>six>>seven>>eight>>nine>>ten>>eleven)
+  //     while (file_list>>one>>two>>three>>four>>fivenew>>six>>seven>>eight>>nine>>ten>>eleven)
   //     {
   //       //std::cout << eleven << '\n';
   //       int i = eleven.length();
