@@ -49,13 +49,39 @@ void cd(char * directory){
 
 void ls(){
   std::vector<Node*> the_childs = curr_node->children;
-  cout << "Size of children LS: " << the_childs.size() << endl;
   for(int i =0; i< the_childs.size(); i++){
     cout << the_childs[i]->name << endl;
   }
 }
 
+void mkdir(char * directory){
+  char * search_char = new char[sizeof(directory)+sizeof(curr_node->name)+1];
+  strcat(search_char, curr_node->name);
+  strcat(search_char, "/");
+  strcat(search_char, directory);
 
+  time_t timer;
+  time(&timer);
+  //create new node
+  Node * new_node = new Node(0, search_char, 0, timer);
+  curr_node->add_child(new_node);
+  new_node->set_parent(curr_node);
+}
+
+void create_function(char * directory){
+  char * search_char = new char[sizeof(directory)+sizeof(curr_node->name)+1];
+  strcat(search_char, curr_node->name);
+  strcat(search_char, "/");
+  strcat(search_char, directory);
+
+  time_t timer;
+  time(&timer);
+  //create new node
+  Node * new_node = new Node(1, search_char, 0, timer);
+  curr_node->add_child(new_node);
+  new_node->set_parent(curr_node);
+
+}
 
 
 
@@ -66,23 +92,18 @@ void delete_function(char * file_directory){
   strcat(search_char, curr_node->name);
   strcat(search_char, "/");
   strcat(search_char, file_directory);
-  // cout << "Search: " << search_char << endl << flush;
+
   Node * new_node = curr_node->find_node_by_name(search_char);
-  // cout << "Node to delete: " << new_node->name << endl << flush;
+
   if(new_node != NULL){
-    // cout << "Children Size: " <<  new_node->children.size() << endl;
+
     if(new_node->children.size() != 0){
       cout << "Can only delete empty directories" << endl <<flush;
     }
     else{
-      // cout << "About to call delete" << endl << flush;
+
       delete_node(new_node);
-      // check curr and parent pointing to same place
-      cout << "Curr Pointer: " << curr_node << endl << flush;
-      cout << "Curr Node childs: " << curr_node->children << endl << flush;
-      cout << "Curr node name: "<< curr_node->name << endl;
-      cout << "Curr node children: "<<curr_node->children.size() << endl;
-      // delete new_node;
+
     }
 
   }
@@ -280,7 +301,7 @@ int main(int argc, char * const argv[]){
   }
 
   //for testing, print the built tree
-  print_tree(globals[0],0);
+  // print_tree(globals[0],0);
 
 
   //Open terminal stuff
@@ -318,12 +339,12 @@ int main(int argc, char * const argv[]){
       ls();
     }
     else if(strcmp(command_line_inputs[0], "mkdir") == 0){   //mkdir
-      cout << "Hit mkdir" << endl;
-      // mkdir(command_line_inputs[1]);
+
+      mkdir(command_line_inputs[1]);
     }
     else if(strcmp(command_line_inputs[0], "create") == 0){   //create
-      cout << "Hit create" << endl;
-      // create(command_line_inputs[1]);
+      // cout << "Hit create" << endl;
+      create_function(command_line_inputs[1]);
     }
     else if(strcmp(command_line_inputs[0], "append") == 0){   //append
       cout << "Hit append" << endl;
@@ -338,8 +359,7 @@ int main(int argc, char * const argv[]){
       delete_function(command_line_inputs[1]);
     }
     else if(strcmp(command_line_inputs[0], "dir") == 0){   //dir
-      cout << "Hit dir" << endl;
-      // dir();
+      print_tree(globals[0], 0);
     }
     else if(strcmp(command_line_inputs[0], "prfiles") == 0){   //prfiles
       cout << "Hit prfiles" << endl;

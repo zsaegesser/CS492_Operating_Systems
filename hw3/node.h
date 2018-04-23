@@ -59,12 +59,22 @@ public:
     size += inc_size;
   }
 
+  void decrease_size(int dec_size){
+    size -= dec_size;
+  }
   //increase the size of all parents of the parent_node, CALLED ON ROOT
   //UNTESTED
   void increase_all_parents_size(Node * parent_node, int inc_size){
     if(parent_node != NULL){
       parent_node->increase_size(inc_size);
       increase_all_parents_size(parent_node->parent, inc_size);
+    }
+  }
+
+  void decrease_all_parents_size(Node * parent_node, int dec_size){
+    if(parent_node != NULL){
+      parent_node->decrease_size(dec_size);
+      decrease_all_parents_size(parent_node->parent, dec_size);
     }
   }
 
@@ -104,19 +114,20 @@ static void print_tree(Node &curr_node, int level){
 
 static void delete_node(Node* old_node){
   Node * parent = old_node->parent;
-  cout << "Parent Pointer: " << parent << endl << flush;
-  std::vector<Node*> the_childs = parent->children;
-  cout << "Children vect: " << the_childs << endl << flush;
-  cout << "Parent: " << parent->name << endl;
-  cout << "Size of children BEFORE: " << the_childs.size()<< endl;
-  for(int i =0; i < the_childs.size(); i++){
-    if(strcmp(the_childs[i]->name, old_node->name)==0){
-      the_childs.erase(the_childs.begin()+i);
+  old_node->decrease_all_parents_size(parent, old_node->size);
+  // cout << "Parent Pointer: " << parent << endl << flush;
+  // std::vector<Node*> parent->children = parent->children;
+  // cout << "Children vect: " << parent->children << endl << flush;
+  // cout << "Parent: " << parent->name << endl;
+  // cout << "Size of children BEFORE: " << parent->children.size()<< endl;
+  for(int i =0; i < parent->children.size(); i++){
+    if(strcmp(parent->children[i]->name, old_node->name)==0){
+      parent->children.erase(parent->children.begin()+i);
     }
   }
-  cout << "Size of children AFTER: "<< the_childs.size() << endl;
-  // old_node->children.clear();
-  // vector<Node*>().swap(old_node->children);
-  // delete old_node->name;
+  // cout << "Size of children AFTER: "<< parent->children.size() << endl;
+  old_node->children.clear();
+  vector<Node*>().swap(old_node->children);
+  delete old_node->name;
   delete old_node;
 }
