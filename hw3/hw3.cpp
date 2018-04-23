@@ -145,6 +145,11 @@ int main(int argc, char * const argv[]){
       dir_list.close();
   }
 
+//CHRIS!!!
+//call the increase_all_parents_size(parent_node, inc_size)
+
+
+
 
   //
   // ifstream file_list(argv[file_list_index]);
