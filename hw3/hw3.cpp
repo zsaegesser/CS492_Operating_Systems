@@ -47,6 +47,49 @@ void cd(char * directory){
   }
 }
 
+void ls(){
+  std::vector<Node*> the_childs = curr_node->children;
+  cout << "Size of children LS: " << the_childs.size() << endl;
+  for(int i =0; i< the_childs.size(); i++){
+    cout << the_childs[i]->name << endl;
+  }
+}
+
+
+
+
+
+
+
+void delete_function(char * file_directory){
+  char * search_char = new char[sizeof(file_directory)+sizeof(curr_node->name)+1];
+  strcat(search_char, curr_node->name);
+  strcat(search_char, "/");
+  strcat(search_char, file_directory);
+  // cout << "Search: " << search_char << endl << flush;
+  Node * new_node = curr_node->find_node_by_name(search_char);
+  // cout << "Node to delete: " << new_node->name << endl << flush;
+  if(new_node != NULL){
+    // cout << "Children Size: " <<  new_node->children.size() << endl;
+    if(new_node->children.size() != 0){
+      cout << "Can only delete empty directories" << endl <<flush;
+    }
+    else{
+      // cout << "About to call delete" << endl << flush;
+      delete_node(new_node);
+      // check curr and parent pointing to same place
+      cout << "Curr Pointer: " << curr_node << endl << flush;
+      cout << "Curr Node childs: " << curr_node->children << endl << flush;
+      cout << "Curr node name: "<< curr_node->name << endl;
+      cout << "Curr node children: "<<curr_node->children.size() << endl;
+      // delete new_node;
+    }
+
+  }
+  else {
+    cout << "Directory not found" << endl << flush;
+  }
+}
 
 
 int main(int argc, char * const argv[]){
@@ -272,8 +315,7 @@ int main(int argc, char * const argv[]){
       cd(command_line_inputs[1]);
     }
     else if(strcmp(command_line_inputs[0], "ls") == 0){      //ls
-      cout << "hit ls" << endl;
-      // ls();
+      ls();
     }
     else if(strcmp(command_line_inputs[0], "mkdir") == 0){   //mkdir
       cout << "Hit mkdir" << endl;
@@ -292,8 +334,8 @@ int main(int argc, char * const argv[]){
       // remove(command_line_inputs[1], command_line_inputs[2]);
     }
     else if(strcmp(command_line_inputs[0], "delete") == 0){   //delete
-      cout << "Hit delete" << endl;
-      // delete(command_line_inputs[1]);
+      // cout << "Hit delete" << endl;
+      delete_function(command_line_inputs[1]);
     }
     else if(strcmp(command_line_inputs[0], "dir") == 0){   //dir
       cout << "Hit dir" << endl;

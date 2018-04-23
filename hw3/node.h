@@ -83,21 +83,40 @@ static void print_tree(Node &curr_node, int level){
 }
 
 
-// is_some_child(a, b) => returns TRUE if a is a child of b, false otherwise
-static bool is_some_child(Node * test_node, Node * curr_node){
-  // cout << "In is_some_child" << endl << flush;
-  // cout << curr_node->name << endl;
-  std::vector<Node *> curr_children = curr_node->children;
-  // cout << "Got children" << endl << flush;
-  for(int i =0; i < curr_children.size(); i++){
-    if(strcmp(test_node->name, curr_children[i]->name) == 0){
-      return true;
+// // is_some_child(a, b) => returns TRUE if a is a child of b, false otherwise
+// static bool is_some_child(Node * test_node, Node * curr_node){
+//   // cout << "In is_some_child" << endl << flush;
+//   // cout << curr_node->name << endl;
+//   std::vector<Node *> curr_children = curr_node->children;
+//   // cout << "Got children" << endl << flush;
+//   for(int i =0; i < curr_children.size(); i++){
+//     if(strcmp(test_node->name, curr_children[i]->name) == 0){
+//       return true;
+//     }
+//   }
+//   for(int i = 0; i < curr_children.size(); i++){
+//     if(!curr_children[i]->children.empty()){
+//       return is_some_child(test_node, curr_children[i]);
+//     }
+//   }
+//   return false;
+// }
+
+static void delete_node(Node* old_node){
+  Node * parent = old_node->parent;
+  cout << "Parent Pointer: " << parent << endl << flush;
+  std::vector<Node*> the_childs = parent->children;
+  cout << "Children vect: " << the_childs << endl << flush;
+  cout << "Parent: " << parent->name << endl;
+  cout << "Size of children BEFORE: " << the_childs.size()<< endl;
+  for(int i =0; i < the_childs.size(); i++){
+    if(strcmp(the_childs[i]->name, old_node->name)==0){
+      the_childs.erase(the_childs.begin()+i);
     }
   }
-  for(int i = 0; i < curr_children.size(); i++){
-    if(!curr_children[i]->children.empty()){
-      return is_some_child(test_node, curr_children[i]);
-    }
-  }
-  return false;
+  cout << "Size of children AFTER: "<< the_childs.size() << endl;
+  // old_node->children.clear();
+  // vector<Node*>().swap(old_node->children);
+  // delete old_node->name;
+  delete old_node;
 }
