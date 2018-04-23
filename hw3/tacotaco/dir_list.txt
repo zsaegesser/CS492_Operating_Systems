@@ -1,8 +1,0 @@
-./
-./pets
-./pets/dogs
-./pets/dogs/ugly
-./pets/dogs/cute
-./pets/cats
-./pets/cats/ugly
-./pets/cats/cute

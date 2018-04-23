@@ -74,7 +74,8 @@ static void print_tree(Node &curr_node, int level){
   for(int i = 0; i < level; i++){
     cout << "   ";
   }
-  cout << curr_node.name << endl;
+  cout << curr_node.name << " size: " << curr_node.size << endl;
+
   for(int i = 0; i < curr_node.children.size(); i++){
     print_tree(*curr_node.children[i], level+1);
   }

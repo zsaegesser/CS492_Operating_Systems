@@ -1,7 +1,8 @@
-  3029089      4 -rw-rw-r--   1 chris    chris          16 Apr 19 16:55 ./dogs/ugly/lab.txt
-  3029087      4 -rw-rw-r--   1 chris    chris          14 Apr 19 16:55 ./dogs/cute/chowchow.txt
-  3029088      4 -rw-rw-r--   1 chris    chris          15 Apr 19 16:55 ./dogs/cute/shiba.txt
-  3029086      4 -rw-rw-r--   1 chris    chris          23 Apr 19 16:54 ./cats/ugly/persian.txt
-  3029084      4 -rw-rw-r--   1 chris    chris          15 Apr 19 16:53 ./cats/cute/sphynx.txt
-  3029085      4 -rw-rw-r--   1 chris    chris          16 Apr 19 16:55 ./cats/cute/f1.txt
-  3029125      0 -rw-rw-r--   1 chris    chris           0 Apr 19 22:11 ./file_list.txt
+  3027101      4 -rw-rw-r--   1 chris    chris          16 Apr 21 20:25 ./dogs/ugly/lab.txt
+  3027098      4 -rw-rw-r--   1 chris    chris          14 Apr 21 20:25 ./dogs/cute/chowchow.txt
+  3027099      4 -rw-rw-r--   1 chris    chris          15 Apr 21 20:25 ./dogs/cute/shiba.txt
+  3027095      4 -rw-rw-r--   1 chris    chris          23 Apr 21 20:25 ./cats/ugly/persian.txt
+  3027093      4 -rw-rw-r--   1 chris    chris          15 Apr 21 20:25 ./cats/cute/sphynx.txt
+  3027092      4 -rw-rw-r--   1 chris    chris          16 Apr 21 20:25 ./cats/cute/f1.txt
+  3027140      4 -rw-rw-r--   1 chris    chris          65 Apr 22 20:58 ./dir_list.txt
+  3027086      0 -rw-rw-r--   1 chris    chris           0 Apr 22 21:06 ./file_list.txt
