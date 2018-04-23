@@ -42,6 +42,7 @@ public:
   // called on root, given name of node you want
   Node* find_node_by_name(char * search_name){
     if((strcmp(name, search_name) == 0)){
+      // cout << "Found Node" << endl;
       return this;
     }
       for(int i = 0; i < children.size(); i++){
@@ -83,16 +84,19 @@ static void print_tree(Node &curr_node, int level){
 
 
 // is_some_child(a, b) => returns TRUE if a is a child of b, false otherwise
-bool is_some_child(Node test_node, Node curr_node){
-  std::vector<Node *> curr_children = curr_node.children;
+static bool is_some_child(Node * test_node, Node * curr_node){
+  // cout << "In is_some_child" << endl << flush;
+  // cout << curr_node->name << endl;
+  std::vector<Node *> curr_children = curr_node->children;
+  // cout << "Got children" << endl << flush;
   for(int i =0; i < curr_children.size(); i++){
-    if(strcmp(test_node.name, curr_children[i]->name) == 0){
+    if(strcmp(test_node->name, curr_children[i]->name) == 0){
       return true;
     }
   }
   for(int i = 0; i < curr_children.size(); i++){
     if(!curr_children[i]->children.empty()){
-      return is_some_child(test_node, *curr_children[i]);
+      return is_some_child(test_node, curr_children[i]);
     }
   }
   return false;

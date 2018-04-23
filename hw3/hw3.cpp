@@ -15,15 +15,37 @@ using namespace std;
 
 std::vector<Node> globals;
 
+Node * curr_node;
 
-void cd(char * directory){
-  // Node new_node = find_node_by_name(directory);
-  // if(is_some_child(curr_node, new_node)){
-  //   curr_node = new_node;
-  // }
-  cout << directory << endl;
+void cd_up(){
+  if(strcmp(curr_node->name, globals[0].name)==0){
+    cout << "Already in the Root directory" << endl << flush;
+  }
+  else{
+      curr_node = curr_node->parent;
+  }
+
 }
 
+void cd(char * directory){
+  if(strcmp(directory, "..")==0){
+    cd_up();
+  }
+  else{
+    char * search_char = new char[sizeof(directory)+sizeof(curr_node->name)+1];
+    strcat(search_char, curr_node->name);
+    strcat(search_char, "/");
+    strcat(search_char, directory);
+    // cout << "Search Char: " << search_char << endl;
+    Node * new_node = curr_node->find_node_by_name(search_char);
+    if(new_node != NULL){
+      curr_node = new_node;
+    }
+    else {
+      cout << "Directory not found" << endl << flush;
+    }
+  }
+}
 
 
 
@@ -39,7 +61,7 @@ int main(int argc, char * const argv[]){
   time_t timer;
   time(&timer);
   globals.push_back(Node(0, "", 0, timer));
-  globals.push_back(Node(0, "", 0, timer));
+  // globals.push_back(Node(0, "", 0, timer));
   // Basic error checking, more for us to not make silly mistake
   if(argc != 9){
     cout << "Wrong number of argumnets";
@@ -102,7 +124,7 @@ int main(int argc, char * const argv[]){
             time_t timer;
             time(&timer);
             //create root node
-            globals[0] = Node(0, line_char, 0, timer);
+            globals[0] = Node(0, ".", 0, timer);
             //set the roots parent
             globals[0].set_parent(NULL);
 
@@ -179,7 +201,7 @@ int main(int argc, char * const argv[]){
           time_t timer;
           time(&timer);
           //create new node
-          Node * temp_node = new Node(0, eleven_char, seven, timer);
+          Node * temp_node = new Node(1, eleven_char, seven, timer);
 
           //set parent of new node to the root
           temp_node->set_parent(&globals[0]);
@@ -198,7 +220,7 @@ int main(int argc, char * const argv[]){
 
       time_t timer;
       time(&timer);
-      Node * new_node = new Node(0, eleven_char, seven, timer);
+      Node * new_node = new Node(1, eleven_char, seven, timer);
 
       //add child to the parent
       parent_node->add_child(new_node);
@@ -214,12 +236,17 @@ int main(int argc, char * const argv[]){
     file_list.close();
   }
 
+  //for testing, print the built tree
   print_tree(globals[0],0);
-  //ZACH: If you are wondering why file_list size is zero, open file_list!
+
 
   //Open terminal stuff
-
+  //set the current directory to the root
+  // globals[1] = globals[0];
+  curr_node = &globals[0];
   while(true){
+    cout << "cats&dogs:  " << curr_node->name << endl;
+    cout << ">>> ";
     char input[128]; //input char array
     cin.getline(input, 128); //get input from user
     vector<char *> command_line_inputs;
@@ -242,7 +269,6 @@ int main(int argc, char * const argv[]){
       split = strtok(NULL, " ");
     }
     if(strcmp(command_line_inputs[0], "cd") == 0){           //cd
-      cout << "Hit cd" << endl;
       cd(command_line_inputs[1]);
     }
     else if(strcmp(command_line_inputs[0], "ls") == 0){      //ls
