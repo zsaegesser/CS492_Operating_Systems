@@ -5,4 +5,4 @@
   3027093      4 -rw-rw-r--   1 chris    chris          15 Apr 21 20:25 ./cats/cute/sphynx.txt
   3027092      4 -rw-rw-r--   1 chris    chris          16 Apr 21 20:25 ./cats/cute/f1.txt
   3027140      4 -rw-rw-r--   1 chris    chris          65 Apr 22 20:58 ./dir_list.txt
-  3027086      0 -rw-rw-r--   1 chris    chris           0 Apr 22 21:06 ./file_list.txt
+  3027084      0 -rw-rw-r--   1 chris    chris           0 Apr 22 21:35 ./file_list.txt

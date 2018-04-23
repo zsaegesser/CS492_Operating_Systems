@@ -146,15 +146,9 @@ int main(int argc, char * const argv[]){
       }
       dir_list.close();
   }
-  print_tree(globals[0],0);
+  //print_tree(globals[0],0);
 
-//CHRIS!!!
-//call the increase_all_parents_size(parent_node, inc_size)
-
-
-
-
-
+  // read from file_list and add all files to directory tree
   ifstream file_list(argv[file_list_index]);
   string one,two,three,four,five,six,eight,nine,ten,eleven;
   int seven;
@@ -178,38 +172,30 @@ int main(int argc, char * const argv[]){
 
       if (parent.compare(".")==0) { // if node is either root or first level
         if (eleven.compare("./")==0) { // if node is root
-
-          // //create timestamp
-          // time_t timer;
-          // time(&timer);
-          // //create root node
-          // globals[0] = Node(0, eleven_char, 0, timer);
-          // //set the roots parent
-          // globals[0].set_parent(NULL);
-
+          // do nothing for root (already exists)
           continue;
         }else{ //First level node
           //create timer
           time_t timer;
           time(&timer);
           //create new node
-          Node * temp_node = new Node(0, eleven_char, 0, timer);
+          Node * temp_node = new Node(0, eleven_char, seven, timer);
 
           //set parent of new node to the root
           temp_node->set_parent(&globals[0]);
           //add new node to child of root
           globals[0].add_child(temp_node);
 
+          globals[0].increase_all_parents_size(&globals[0], seven);
+
           continue;
         }
-        //delete the eleven char *
         delete [] eleven_char;
       }
-      //std::cout << "parent: " << parent_char << '\n';
+
       //find the parent node of the current node adding
       Node * parent_node = globals[0].find_node_by_name(parent_char);
 
-      //std::cout << "parent node name: " << parent_node->name << '\n';
       time_t timer;
       time(&timer);
       Node * new_node = new Node(0, eleven_char, seven, timer);
@@ -226,34 +212,10 @@ int main(int argc, char * const argv[]){
       delete [] parent_char;
     }
     file_list.close();
-      // while (file_list>>one>>two>>three>>four>>fivenew>>six>>seven>>eight>>nine>>ten>>eleven)
-      // {
-      //   //std::cout << eleven << '\n';
-      //   int i = eleven.length();
-      //   while (eleven[i] != '/') {
-      //     i--;
-      //   }
-      //   string parent = eleven.substr(0,i);
-      //   if (parent.compare(".")==0) {
-      //     std::cout << "first level" << '\n';
-      //   }
-      //   if (eleven.compare("./")==0) {
-      //     //root no parent
-      //     std::cout << "root beer" << '\n';
-      //   }
-      //
-      //   char *eleven_char = new char[eleven.length() + 1];
-      //   strcpy(eleven_char, eleven.c_str());
-      //   // do stuff
-      //   delete [] eleven_char;
-      //
-      //   // convert to char * for use with Node class
-      //   //std::cout << "NEW NODE: \'" << eleven << "\' WITH PARENT: \'" << eleven.substr(0,i) << "\'" << flush << '\n';
-      // }
-      // file_list.close();
   }
+
   print_tree(globals[0],0);
-  //print_tree(*root,0);
+  //ZACH: If you are wondering why file_list size is zero, open file_list!
 
   //Open terminal stuff
 
