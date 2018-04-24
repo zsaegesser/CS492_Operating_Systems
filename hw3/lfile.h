@@ -43,17 +43,20 @@ public:
     }
     return number;
   }
-  void add_bytes(long bytes){
+  void add_bytes(long bytes, Ldisk * ldisk){
     long local_bytes = bytes;
     //TESTING
-    long temp = 8;
+    // long temp = 8;
+    // if(bytes > ldisk->size*ldisk->disk_size){
+    //   return;
+    // }
     if(this->get_number_of_blocks()*this->block_size >= (size+bytes)){
       // case where do NOT need to add new disk_block
       if(size ==0){
         //create block
-        //this->add_disk_block(ldisk->fetch());
+        this->add_disk_block(ldisk->fetch());
         //TESTING
-        this->add_disk_block(temp);
+        // this->add_disk_block(temp);
       }
       size += bytes;
     }
@@ -62,16 +65,16 @@ public:
       while(local_bytes != 0){
         if(local_bytes < this->block_size){
           //create last new block
-          //this->add_disk_block(ldisk->fetch());
+          this->add_disk_block(ldisk->fetch());
           //TESTING
-          this->add_disk_block(temp);
+          // this->add_disk_block(temp);
           local_bytes = 0;
         }
         else{
           //create block
-          //this->add_disk_block(ldisk->fetch());
+          this->add_disk_block(ldisk->fetch());
           //TESTING
-          this->add_disk_block(temp);
+          // this->add_disk_block(temp);
           local_bytes -= block_size;
         }
       }
@@ -79,7 +82,11 @@ public:
     }
   }
 
-  void remove_bytes(long bytes){
+  void remove_bytes(long bytes, Ldisk * ldisk){
+    if(size < bytes){
+      cout << "You can't remove more bytes than the file has" << endl << flush;
+      return;
+    }
     if(size-(this->get_number_of_blocks()*(this->block_size-1)) > bytes){
       //case where you do NOT need to remove a disk_block
       if(this->size == 0){
@@ -88,9 +95,9 @@ public:
       else{
         if(this->size < bytes){
           cout << "You tried to remove more bytes than the file had. We set the file to size of 0, remove it if you like" << endl << flush;
-          //ldisk->remove(this->remove_last_disk_block());
+          ldisk->remove(this->remove_last_disk_block());
           // TESTING
-          long temp = this->remove_last_disk_block();
+          // long temp = this->remove_last_disk_block();
           size = 0;
         }
         else {
@@ -104,29 +111,32 @@ public:
       //case where you need to remove a disk_block
       long local_bytes = bytes;
       while(local_bytes != 0){
-        cout << "Local Bytes: " << local_bytes << endl << flush;
-        this->print_lfile();
-        if(local_bytes < this->block_size){
-          cout << "First if" << endl << flush;
+        // cout << "Local Bytes: " << local_bytes << endl << flush;
+        // this->print_lfile();
+        if(local_bytes < size-((this->get_number_of_blocks()-1)*(this->block_size))){
+          // cout << "Local Bytes: " <<  local_bytes << endl << flush;
+          // cout << "First if" << endl << flush;
           //ldisk->remove(this->remove_last_disk_block());
           //TESTING
           // cout << "here" << endl << flush;
           // this->print_lfile();
           // long temp = this->remove_last_disk_block();
           // cout << "here2"  << endl << flush;
+          // cout << "Case 1" << endl << flush;
           size -= local_bytes;
           local_bytes = 0;
 
         }
         else {
-          cout << "Second if" << endl << flush;
-          cout <<"Bytes to Subtract: " << size-((this->get_number_of_blocks()-1)*(this->block_size)) << endl <<flush;
+          // cout << "Case 2" << endl << flush;
+          // cout << "Second if" << endl << flush;
+          // cout <<"Bytes to Subtract: " << size-((this->get_number_of_blocks()-1)*(this->block_size)) << endl <<flush;
           local_bytes -= size-((this->get_number_of_blocks()-1)*(this->block_size));
           size -= size-((this->get_number_of_blocks()-1)*(this->block_size));
-          //ldisk->remove(this->remove_last_disk_block());
+          ldisk->remove(this->remove_last_disk_block());
           //TESTING
           // cout << "good" << endl << flush;
-          long temp = this->remove_last_disk_block();
+          // long temp = this->remove_last_disk_block();
           // cout << "good2" << endl << flush;
         }
       }
@@ -136,6 +146,10 @@ public:
   }
 
   void add_disk_block(long blk_addr){
+    if(blk_addr < 0){
+      // cout << "You tried to add more bytes than were left in Ldisk, we filed the Ldisk then stopped" << endl << flush;
+      return;
+    }
     disk_block * current = this->head;
     if(current == NULL){
       this->head = new disk_block(blk_addr, NULL);

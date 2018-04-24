@@ -142,16 +142,16 @@ public:
       if(current->range.first <= block_number && current->range.second >= block_number){
         //FOUND BLOCK
         if (!current->used) {
-          std::cout << "THAT BLOCK IS FREE" << '\n' <<flush;
+          // std::cout << "THAT BLOCK IS FREE" << '\n' <<flush;
           return;
         }else if (current->range.first == current->range.second) {/* block group is of size 1*/
           if (previous == NULL && current->next == NULL) {
             //change it to freeeeeeeeeeeeeeeeeee!
-            std::cout << "CONDITION 1" << '\n' << flush;
+            // std::cout << "CONDITION 1" << '\n' << flush;
             current->used = 0;
             return;
           }else if(previous == NULL) { /*block group is at beginning of ldisk*/
-            std::cout << "CONDITION 2" << '\n' << flush;
+            // std::cout << "CONDITION 2" << '\n' << flush;
             current->next->range.first -= 1;
 
             //update head to current->next
@@ -159,13 +159,13 @@ public:
             delete current;
             return;
           }else if(current->next == NULL){/*block group at end of ldisk*/
-            std::cout << "CONDITION 3" << '\n' << flush;
+            // std::cout << "CONDITION 3" << '\n' << flush;
             previous->range.second +=1;
             previous->next = NULL;
             delete current;
             return;
           }else{
-            std::cout << "CONDITION 4" << '\n' << flush;
+            // std::cout << "CONDITION 4" << '\n' << flush;
             //in middle of ldisk
             previous->range.second = current->next->range.second;
             previous->next = current->next->next;
@@ -176,7 +176,7 @@ public:
         }else if (current->range.first == block_number){
           //block found at head of used block_group
           if (previous == NULL) {
-            std::cout << "CONDITION 5" << '\n' << flush;
+            // std::cout << "CONDITION 5" << '\n' << flush;
             //block group is first block group
             //create new block group
             block_group * new_group = new block_group(0,pair<int,int>(0,0),current);
@@ -185,7 +185,7 @@ public:
             current->range.first +=1;
             return;
           }else{
-            std::cout << "CONDITION 6" << '\n' << flush;
+            // std::cout << "CONDITION 6" << '\n' << flush;
             //head of block group but not head of ldisk
             //update previous range.second by 1
             previous->range.second +=1;
@@ -195,7 +195,7 @@ public:
           }
         }else if(current->range.second == block_number){
           if (current->next== NULL ){
-            std::cout << "CONDITION 7" << '\n' << flush;
+            // std::cout << "CONDITION 7" << '\n' << flush;
             /* last block in block group at end of ldisk*/
             //create new block group
               //set its next to null
@@ -208,14 +208,14 @@ public:
             current->next = new_group;
             return;
           }else{
-            std::cout << "CONDITION 8" << '\n' << flush;
+            // std::cout << "CONDITION 8" << '\n' << flush;
             //last block in block group in middle of ldisk
             current->range.second -=1;
             current->next->range.first -=1;
             return;
           }
         }else{
-          std::cout << "CONDITION 9" << '\n' << flush;
+          // std::cout << "CONDITION 9" << '\n' << flush;
           //Double Middle: middle of Ldisk and block in middle of block group
           //create two new nodes
             //new used node
