@@ -80,17 +80,23 @@ public:
   }
 
   void remove_bytes(long bytes){
-    if(this->get_number_of_blocks()*(this->block_size-1) > (size-bytes)){
+    if(size-(this->get_number_of_blocks()*(this->block_size-1)) > bytes){
       //case where you do NOT need to remove a disk_block
-      if(this->size < bytes){
-        cout << "You tried to remove more bytes than the file had. We set the file to size of 0, remove it if you like" << endl << flush;
-        //ldisk->remove(this->remove_last_disk_block());
-        // TESTING
-        long temp = this->remove_last_disk_block();
-        size = 0;
+      if(this->size == 0){
+        cout << "The file is already empty" << endl << flush;
       }
-      else {
-        size -= bytes;
+      else{
+        if(this->size < bytes){
+          cout << "You tried to remove more bytes than the file had. We set the file to size of 0, remove it if you like" << endl << flush;
+          //ldisk->remove(this->remove_last_disk_block());
+          // TESTING
+          long temp = this->remove_last_disk_block();
+          size = 0;
+        }
+        else {
+          cout << "MY guess is here" << endl << flush;
+          size -= bytes;
+        }
       }
     }
     else {
@@ -99,16 +105,24 @@ public:
       long local_bytes = bytes;
       while(local_bytes != 0){
         if(local_bytes < this->block_size){
+          //ldisk->remove(this->remove_last_disk_block());
+          //TESTING
+          // cout << "here" << endl << flush;
+          // this->print_lfile();
+          long temp = this->remove_last_disk_block();
+          // cout << "here2"  << endl << flush;
           local_bytes = 0;
         }
         else {
           local_bytes -= this->block_size;
           //ldisk->remove(this->remove_last_disk_block());
           //TESTING
+          // cout << "good" << endl << flush;
           long temp = this->remove_last_disk_block();
+          // cout << "good2" << endl << flush;
         }
       }
-      size -= bytes
+      size -= bytes;
     }
   }
 
@@ -133,11 +147,17 @@ public:
     disk_block * prev = NULL;
     long block_address = 0;
     while(current->next != NULL){
+      // cout << "Shouldnt have gotten here, last step" << endl <<flush;
       prev = current;
       current = current->next;
     }
     block_address = current->block_address;
-    prev->next = NULL;
+    if(prev != NULL){
+      prev->next = NULL;
+    }
+    else {
+      this->head = NULL;
+    }
     delete current;
     return block_address;
   }
