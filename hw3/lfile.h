@@ -99,9 +99,16 @@ public:
       long local_bytes = bytes;
       while(local_bytes != 0){
         if(local_bytes < this->block_size){
-
+          local_bytes = 0;
+        }
+        else {
+          local_bytes -= this->block_size;
+          //ldisk->remove(this->remove_last_disk_block());
+          //TESTING
+          long temp = this->remove_last_disk_block();
         }
       }
+      size -= bytes
     }
   }
 
