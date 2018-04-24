@@ -20,7 +20,7 @@ int main(int argc, char * const argv[]){
   // lfile->remove_last_disk_block();
   long temp = 20;
   lfile->add_bytes(temp);
-  lfile->remove_bytes(10);
+  lfile->remove_bytes(17);
 
   lfile->print_lfile();
 }

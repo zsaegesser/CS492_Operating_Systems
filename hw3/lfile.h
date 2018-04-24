@@ -94,7 +94,7 @@ public:
           size = 0;
         }
         else {
-          cout << "MY guess is here" << endl << flush;
+          // cout << "MY guess is here" << endl << flush;
           size -= bytes;
         }
       }
@@ -104,17 +104,25 @@ public:
       //case where you need to remove a disk_block
       long local_bytes = bytes;
       while(local_bytes != 0){
+        cout << "Local Bytes: " << local_bytes << endl << flush;
+        this->print_lfile();
         if(local_bytes < this->block_size){
+          cout << "First if" << endl << flush;
           //ldisk->remove(this->remove_last_disk_block());
           //TESTING
           // cout << "here" << endl << flush;
           // this->print_lfile();
-          long temp = this->remove_last_disk_block();
+          // long temp = this->remove_last_disk_block();
           // cout << "here2"  << endl << flush;
+          size -= local_bytes;
           local_bytes = 0;
+
         }
         else {
-          local_bytes -= this->block_size;
+          cout << "Second if" << endl << flush;
+          cout <<"Bytes to Subtract: " << size-((this->get_number_of_blocks()-1)*(this->block_size)) << endl <<flush;
+          local_bytes -= size-((this->get_number_of_blocks()-1)*(this->block_size));
+          size -= size-((this->get_number_of_blocks()-1)*(this->block_size));
           //ldisk->remove(this->remove_last_disk_block());
           //TESTING
           // cout << "good" << endl << flush;
@@ -122,7 +130,8 @@ public:
           // cout << "good2" << endl << flush;
         }
       }
-      size -= bytes;
+
+
     }
   }
 
