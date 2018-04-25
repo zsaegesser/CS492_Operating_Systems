@@ -20,6 +20,8 @@ using namespace std;
 //breath first search print on dir (is currently depth)
 //prfiles implementation
 //prdisk implementation
+//update timestamps for all file modifications
+  //mkdir, append, remove,
 
 
 
@@ -116,7 +118,29 @@ void append_function(char * file, char * bytes){
       globals[0].increase_all_parents_size(curr_node, atoi(bytes));
     }
   }
+}
 
+void remove_function(char * file, char * bytes){
+  char search_char [sizeof(file)+sizeof(curr_node->name)+2] = {};
+  strcat(search_char, curr_node->name);
+  strcat(search_char, "/");
+  strcat(search_char, file);
+
+  Node * node_to_append = curr_node->find_node_by_name(search_char);
+
+  if(node_to_append == NULL){
+    cout << "File not found" << endl << flush;
+  }
+  else {
+    if(!node_to_append->type){
+      cout << "Cannot append to directory" << endl << flush;
+    }
+    else{
+      node_to_append->f->remove_bytes(atoi(bytes), ldisk);
+      node_to_append->update_size();
+      globals[0].decrease_all_parents_size(curr_node, atoi(bytes));
+    }
+  }
 }
 
 
@@ -385,8 +409,7 @@ int main(int argc, char * const argv[]){
       // append(command_line_inputs[1], command_line_inputs[2]);
     }
     else if(strcmp(command_line_inputs[0], "remove") == 0){   //remove
-      cout << "Hit remove" << endl;
-      // remove(command_line_inputs[1], command_line_inputs[2]);
+      remove_function(command_line_inputs[1], command_line_inputs[2]);
     }
     else if(strcmp(command_line_inputs[0], "delete") == 0){   //delete
       // cout << "Hit delete" << endl;
