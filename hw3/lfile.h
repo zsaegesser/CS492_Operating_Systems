@@ -205,6 +205,13 @@ public:
       blocks +=1;
     }
   }
+  void print_block_addresses(){
+    disk_block * current = this->head;
+    while(current != NULL){
+      cout << current->block_address << " " << flush;
+      current=current->next;
+    }
+  }
 
   long frag_count(){
     return (this->block_size-(this->size-((this->get_number_of_blocks()-1)*(this->block_size))));

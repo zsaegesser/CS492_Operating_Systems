@@ -423,8 +423,8 @@ int main(int argc, char * const argv[]){
       print_treeB(&globals[0]);
     }
     else if(strcmp(command_line_inputs[0], "prfiles") == 0){   //prfiles
-      cout << "Hit prfiles" << endl;
-      // prfiles();
+      // cout << "Hit prfiles" << endl;
+      print_files(&globals[0]);
     }
     else if(strcmp(command_line_inputs[0], "prdisk") == 0){   //prdisk
       cout << total_fragmentation(&globals[0]) << endl << flush;
