@@ -16,8 +16,7 @@ using namespace std;
 
 //TODO
 //deallocate on exit
-//prfiles implementation
-//prdisk implementation
+
 
 
 
@@ -427,11 +426,12 @@ int main(int argc, char * const argv[]){
       print_files(&globals[0]);
     }
     else if(strcmp(command_line_inputs[0], "prdisk") == 0){   //prdisk
-      cout << total_fragmentation(&globals[0]) << endl << flush;
+      ldisk->print_footprint();
+      cout <<"fragmentation: " << total_fragmentation(&globals[0]) << " bytes" <<endl << flush;
       // prdisk();
     }
     else {
-      cout << "Command not recognized" << endl;
+      cout << "Command not recognized" << endl << flush;
     }
 
   }
