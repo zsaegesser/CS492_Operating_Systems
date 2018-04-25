@@ -236,7 +236,7 @@ public:
   }
 
   //printout of ldisk for footer
-  void print_footer(){
+  void print_footprint(){
     block_group * current = this->head;
     int i = 0;
     while (current!=NULL) {
