@@ -98,7 +98,22 @@ static void print_tree(Node &curr_node, int level){
   }
 }
 
+static void print_treeB(Node * root_node){
+  queue<Node*>  print_queue;  //queue of nodes
+  print_queue.push(root_node);//add root to queue
+  while (print_queue.size() != 0) {/*queue isn't empty */
+    Node * curr_node = print_queue.front();
+    for (size_t i = 0; i < curr_node->children.size(); i++) {/*size of children vector at head of queue*/
+      //push_back child node to queue
+      print_queue.push(curr_node->children[i]);
 
+    }
+    //print current node
+    std::cout << curr_node->name << '\n' <<flush;
+    //pop queue
+    print_queue.pop();
+  }
+}
 // // is_some_child(a, b) => returns TRUE if a is a child of b, false otherwise
 // static bool is_some_child(Node * test_node, Node * curr_node){
 //   // cout << "In is_some_child" << endl << flush;
