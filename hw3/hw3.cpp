@@ -9,7 +9,8 @@
 #include "node.h"
 #include <time.h>
 #include <fstream>
-#include "lfile.h"
+// #include "ldisk.h"
+// #include "lfile.h"
 
 using namespace std;
 
@@ -100,7 +101,8 @@ void append_function(char * file, char * bytes){
   strcat(search_char, file);
 
   Node * node_to_append = curr_node->find_node_by_name(search_char);
-
+  // d->print();
+  // f->print_lfile();
   if(node_to_append == NULL){
     cout << "File not found" << endl << flush;
   }

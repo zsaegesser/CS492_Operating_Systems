@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <cstdlib>
 #include <cstring>
-// #include "ldisk.h"
+#include "ldisk.h"
 
 using namespace std;
 
@@ -63,14 +63,14 @@ public:
     else {
       //normal case to add new blocks
       while(local_bytes != 0){
-        cout << "Frag at this time: " << (this->block_size-(this->size-((this->get_number_of_blocks()-1)*(this->block_size)))) << endl << flush;
+        // cout << "Frag at this time: " << (this->block_size-(this->size-((this->get_number_of_blocks()-1)*(this->block_size)))) << endl << flush;
         if((this->block_size-(this->size-((this->get_number_of_blocks()-1)*(this->block_size))))>0){
           local_bytes -= (this->block_size-(this->size-((this->get_number_of_blocks()-1)*(this->block_size))));
           size += (this->block_size-(this->size-((this->get_number_of_blocks()-1)*(this->block_size))));
         }
         else if(local_bytes < this->block_size){
           //create last new block
-          cout << "Adding Block..  Local Bytes: " << local_bytes << " Size: " << this->size << endl << flush;
+          // cout << "Adding Block..  Local Bytes: " << local_bytes << " Size: " << this->size << endl << flush;
           this->add_disk_block(ldisk->fetch());
           //TESTING
           // this->add_disk_block(temp);
@@ -79,7 +79,7 @@ public:
         }
         else{
           //create block
-          cout << "Adding Block..  Local Bytes: " << local_bytes << " Size: " << this->size << endl << flush;
+          // cout << "Adding Block..  Local Bytes: " << local_bytes << " Size: " << this->size << endl << flush;
           this->add_disk_block(ldisk->fetch());
           //TESTING
           // this->add_disk_block(temp);
