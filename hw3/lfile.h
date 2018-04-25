@@ -43,46 +43,43 @@ public:
     }
     return number;
   }
+
+  //the function that corresponds to append in the shell
+  //takes number of bytes and a pointer to the Ldisk
+  //adds that many bytes to the Lfile
+  //adds bytes by adding disk_blocks
+  //gets the memory address of the blocks with ldisk->fetch()
   void add_bytes(long bytes, Ldisk * ldisk){
-    long local_bytes = bytes;
-    //TESTING
-    // long temp = 8;
-    // if(bytes > ldisk->size*ldisk->disk_size){
-    //   return;
-    // }
+    long local_bytes = bytes;    //local storage of bytes
     if(this->get_number_of_blocks()*this->block_size >= (size+bytes)){
       // case where do NOT need to add new disk_block
       if(size ==0){
         //create block
         this->add_disk_block(ldisk->fetch());
-        //TESTING
-        // this->add_disk_block(temp);
       }
+      //add to the size of lfile
       size += bytes;
     }
     else {
-      //normal case to add new blocks
+      //case where you need to add at least one block
       while(local_bytes != 0){
-        // cout << "Frag at this time: " << (this->block_size-(this->size-((this->get_number_of_blocks()-1)*(this->block_size)))) << endl << flush;
+        //this condition checks if the current Ldisk has fragmentation, if it does then fill the fragmentation first
         if((this->block_size-(this->size-((this->get_number_of_blocks()-1)*(this->block_size))))>0){
+          //reduce local_bytes and increase size
           local_bytes -= (this->block_size-(this->size-((this->get_number_of_blocks()-1)*(this->block_size))));
           size += (this->block_size-(this->size-((this->get_number_of_blocks()-1)*(this->block_size))));
         }
-        else if(local_bytes < this->block_size){
+        else if(local_bytes < this->block_size){ //checks if we only need to add one more block
           //create last new block
-          // cout << "Adding Block..  Local Bytes: " << local_bytes << " Size: " << this->size << endl << flush;
           this->add_disk_block(ldisk->fetch());
-          //TESTING
-          // this->add_disk_block(temp);
+          //add to size then set local_bytes to 0 to trip while loop condition
           size+= local_bytes;
           local_bytes = 0;
         }
-        else{
+        else{ //this condition is when you are adding a NON last block (or last block that is filled perfectly)
           //create block
-          // cout << "Adding Block..  Local Bytes: " << local_bytes << " Size: " << this->size << endl << flush;
           this->add_disk_block(ldisk->fetch());
-          //TESTING
-          // this->add_disk_block(temp);
+          //reduce local bytes and increase size of ldisk
           local_bytes -= block_size;
           size+= block_size;
         }
@@ -91,6 +88,10 @@ public:
     }
   }
 
+  //function that corresponds to remove in the shell
+  //removes bytes from lfile
+  //takes the number of bytes to remove and the ldisk
+  //removes blocks if necessary and deletes the blocks from ldisk
   void remove_bytes(long bytes, Ldisk * ldisk){
     if(size < bytes){
       cout << "You can't remove more bytes than the file has" << endl << flush;
@@ -103,97 +104,95 @@ public:
       }
       else{
         if(this->size < bytes){
-          cout << "You tried to remove more bytes than the file had. We set the file to size of 0, remove it if you like" << endl << flush;
           ldisk->remove(this->remove_last_disk_block());
-          // TESTING
-          // long temp = this->remove_last_disk_block();
           size = 0;
         }
         else {
-          // cout << "MY guess is here" << endl << flush;
+          //reduce the size
           size -= bytes;
         }
       }
     }
     else {
-      //also check the (this->size < bytes, if so remove all nodes)
       //case where you need to remove a disk_block
-      long local_bytes = bytes;
+      long local_bytes = bytes; //set local storage of bytes
       while(local_bytes != 0){
-        // cout << "Local Bytes: " << local_bytes << endl << flush;
-        // this->print_lfile();
+
         if(local_bytes < size-((this->get_number_of_blocks()-1)*(this->block_size))){
-          // cout << "Local Bytes: " <<  local_bytes << endl << flush;
-          // cout << "First if" << endl << flush;
-          //ldisk->remove(this->remove_last_disk_block());
-          //TESTING
-          // cout << "here" << endl << flush;
-          // this->print_lfile();
-          // long temp = this->remove_last_disk_block();
-          // cout << "here2"  << endl << flush;
-          // cout << "Case 1" << endl << flush;
+          //this condition is if you have removed enough blocks and now just need to remove some that is less than the block size
           size -= local_bytes;
           local_bytes = 0;
-
         }
         else {
-          // cout << "Case 2" << endl << flush;
-          // cout << "Second if" << endl << flush;
-          // cout <<"Bytes to Subtract: " << size-((this->get_number_of_blocks()-1)*(this->block_size)) << endl <<flush;
+          //case that removes a block
+          //decrease local bytes by the appropriate amount, if first remove, then this is fragmentation, else this is just the block size
           local_bytes -= size-((this->get_number_of_blocks()-1)*(this->block_size));
+          //reduce the size by the same amount
           size -= size-((this->get_number_of_blocks()-1)*(this->block_size));
+          //remove block
           ldisk->remove(this->remove_last_disk_block());
-          //TESTING
-          // cout << "good" << endl << flush;
-          // long temp = this->remove_last_disk_block();
-          // cout << "good2" << endl << flush;
         }
       }
-
-
     }
   }
 
+  //function that adds a disk block to the linked list lfile
+  //takes the block address of the new block
   void add_disk_block(long blk_addr){
     if(blk_addr < 0){
-      // cout << "You tried to add more bytes than were left in Ldisk, we filed the Ldisk then stopped" << endl << flush;
+      //this case is if the Ldisk is full, ldisk->fetch returns -1 if the ldisk is full
+      //do nothing, the ldisk->fetch function prints an error
       return;
     }
+    //create a tempory node pointer to the head of the linked list,
+    //this is essentially the iterative way to append a node to a single linked list
     disk_block * current = this->head;
     if(current == NULL){
+      //if the linked list is empty, then the head is the new node
       this->head = new disk_block(blk_addr, NULL);
     }
     else{
       while(current->next != NULL){
+        //this case is if you need continue to the next node, essentially current is not the last node in the linked list
         current = current->next;
       }
+      //found the last node, now append the new node to the end of lfile
       current->next = new disk_block(blk_addr, NULL);
     }
 
   }
 
+  //removes the last block in the lfile linked list
   //returns the block address of the removed disk_block
   long remove_last_disk_block(){
-
+    //need to keep track of both the current node and the previous node
     disk_block * current = this->head;
     disk_block * prev = NULL;
     long block_address = 0;
+    //iterative way to get to the end of the linked list
     while(current->next != NULL){
-      // cout << "Shouldnt have gotten here, last step" << endl <<flush;
+      //set up the prev and current for next iteration
       prev = current;
       current = current->next;
     }
+    //when find the end, loop breaks
+
+    //get teh block address of the node you are about to delete
     block_address = current->block_address;
+
+    //if its not the first node then the previous now points to NULL (meaning it is the end of the lfild), otherwise the head now points to null
     if(prev != NULL){
       prev->next = NULL;
     }
     else {
       this->head = NULL;
     }
+    // delete the node you removed
     delete current;
     return block_address;
   }
 
+//Testing function used to print the lfile
   void print_lfile(){
     disk_block * current = this->head;
     int blocks = 0;
@@ -205,15 +204,27 @@ public:
       blocks +=1;
     }
   }
+
+  //corresponds to the prfiles shell command
+  //prints out the addresses of all of the disk_blocks in lfile
   void print_block_addresses(){
+    //iteratively scroll through the lfile
     disk_block * current = this->head;
     while(current != NULL){
+      //print the block address
       cout << current->block_address << " " << flush;
+      //set up next iteration
       current=current->next;
     }
   }
 
+  //function that helps the prdisk shell command
+  //returns the fragmentation of the lfile
   long frag_count(){
+    //the fragmentation is essentially,
+    //the fragmentaiton is esssentially the difference between the block size and how many bytes are stored in the last block
+    //this math does that,    block size      -      (  (num_blocks-1)           *            block_size)
+    //                      constant block size      # blocks not including last block       constant block size
     return (this->block_size-(this->size-((this->get_number_of_blocks()-1)*(this->block_size))));
   }
 };
