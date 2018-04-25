@@ -378,6 +378,9 @@ int main(int argc, char * const argv[]){
 
     //quit now if exit command
     if(strcmp(input, "exit") == 0){
+      //call depth first search tree delete function on global[0]
+      delete ldisk;
+      delete curr_node;
       break;
     }
     if(strcmp(input, "") == 0){
@@ -406,29 +409,23 @@ int main(int argc, char * const argv[]){
       create_function(command_line_inputs[1]);
     }
     else if(strcmp(command_line_inputs[0], "append") == 0){   //append
-      cout << "Hit append" << endl;
       append_function(command_line_inputs[1], command_line_inputs[2]);
-
-      // append(command_line_inputs[1], command_line_inputs[2]);
     }
     else if(strcmp(command_line_inputs[0], "remove") == 0){   //remove
       remove_function(command_line_inputs[1], command_line_inputs[2]);
     }
     else if(strcmp(command_line_inputs[0], "delete") == 0){   //delete
-      // cout << "Hit delete" << endl;
       delete_function(command_line_inputs[1]);
     }
     else if(strcmp(command_line_inputs[0], "dir") == 0){   //dir
       print_treeB(&globals[0]);
     }
     else if(strcmp(command_line_inputs[0], "prfiles") == 0){   //prfiles
-      // cout << "Hit prfiles" << endl;
       print_files(&globals[0]);
     }
     else if(strcmp(command_line_inputs[0], "prdisk") == 0){   //prdisk
       ldisk->print_footprint();
       cout <<"fragmentation: " << total_fragmentation(&globals[0]) << " bytes" <<endl << flush;
-      // prdisk();
     }
     else {
       cout << "Command not recognized" << endl << flush;
