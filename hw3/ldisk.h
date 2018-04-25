@@ -29,7 +29,7 @@ private:
 
 public:
   block_group *head;
-  long ldisk_size; //total number of block groups
+  long ldisk_size; //total number of blocks
 
   //write constructor that sets up empty Ldisk
   Ldisk(long disk_size,long tblock_size){
@@ -39,24 +39,6 @@ public:
     block_group * starter = new block_group(0, pair<int,int> (0,ldisk_size-1),NULL);
     head = starter;
   }
-
-  long remaining(){
-    //return total number of free bytes
-    //loop through ldisk
-    //if free add range to count
-    //return count
-    block_group * current = this->head;
-    long count = 0;
-    while (current!=NULL) {
-      if (!current->used) {
-        count += current->range.second - (current->range.first-1);
-      }
-      //keep goin
-      current = current->next;
-    }
-    return count;
-  }
-
 
   //fetch finds the next available block_group (returning it's address), unmarks it as 'used' and refreshes ldisk by combining the surrounding node groups
   long fetch(){

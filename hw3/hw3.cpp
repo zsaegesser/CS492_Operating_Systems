@@ -13,15 +13,10 @@
 using namespace std;
 
 //TODO
-//add_bytes after every creation of a file Node
-//update Node size in append_function
-//remove bytes function
 //deallocate on exit
-//breath first search print on dir (is currently depth)
 //prfiles implementation
 //prdisk implementation
-//update timestamps for all file modifications
-  //mkdir, append, remove,
+
 
 
 
@@ -116,6 +111,9 @@ void append_function(char * file, char * bytes){
       node_to_append->f->add_bytes(atoi(bytes), ldisk);
       node_to_append->update_size();
       globals[0].increase_all_parents_size(curr_node, atoi(bytes));
+      time_t timer;
+      time(&timer);
+      node_to_append->timestamp = timer;
     }
   }
 }
@@ -139,6 +137,9 @@ void remove_function(char * file, char * bytes){
       node_to_append->f->remove_bytes(atoi(bytes), ldisk);
       node_to_append->update_size();
       globals[0].decrease_all_parents_size(curr_node, atoi(bytes));
+      time_t timer;
+      time(&timer);
+      node_to_append->timestamp = timer;
     }
   }
 }
@@ -416,7 +417,7 @@ int main(int argc, char * const argv[]){
       delete_function(command_line_inputs[1]);
     }
     else if(strcmp(command_line_inputs[0], "dir") == 0){   //dir
-      print_tree(globals[0], 0);
+      print_treeB(&globals[0]);
     }
     else if(strcmp(command_line_inputs[0], "prfiles") == 0){   //prfiles
       cout << "Hit prfiles" << endl;

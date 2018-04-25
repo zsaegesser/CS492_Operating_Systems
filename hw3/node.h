@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "lfile.h"
-
+#include <queue>
 using namespace std;
 
 
