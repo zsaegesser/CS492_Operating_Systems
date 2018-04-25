@@ -379,8 +379,9 @@ int main(int argc, char * const argv[]){
     //quit now if exit command
     if(strcmp(input, "exit") == 0){
       //call depth first search tree delete function on global[0]
-      delete ldisk;
-      delete curr_node;
+      delete_tree(&globals[0]);
+      // delete ldisk;
+      // delete curr_node;
       break;
     }
     if(strcmp(input, "") == 0){
