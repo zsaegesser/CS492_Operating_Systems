@@ -182,6 +182,18 @@ static void print_files(Node * root_node){
 //   return false;
 // }
 
+static void delete_tree(Node * curr_node, int level){
+  cout << curr_node.name << " size: " << curr_node.size << endl;
+
+  while (curr_node.children.size() >=0) {//while children exist
+    for (size_t i = 0; i < curr_node.children.size(); i++) {
+      delete_tree(curr_node.children[i]);
+    }
+  }
+  delete_node(curr_node);
+  return;
+}
+
 static void delete_node(Node* old_node){
   Node * parent = old_node->parent;
   old_node->decrease_all_parents_size(parent, old_node->size);
