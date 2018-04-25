@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <cstdlib>
 #include <cstring>
-// #include "ldisk.h"
+#include "ldisk.h"
 
 using namespace std;
 

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <cstdlib>
 #include <cstring>
+#include "lfile.h"
 
 using namespace std;
 
@@ -18,8 +19,9 @@ public:
   Node * parent;
   std::vector<Node *> children;
   bool type; //0 for directory, 1 for file
+  Lfile * f;
 
-  Node(bool node_type, char * node_name, int node_size, time_t node_timestamp){
+  Node(bool node_type, char * node_name, int node_size, time_t node_timestamp, Lfile * lfile){
     type = node_type;
 
     name = new char[strlen(node_name)];
@@ -27,8 +29,12 @@ public:
 
     size = node_size;
     timestamp = node_timestamp;
+    f = lfile;
   }
 
+  void update_size(){
+    size = f->size;
+  }
   //set parent of node function was called on
   void set_parent(Node * node_parent){
     parent = node_parent;

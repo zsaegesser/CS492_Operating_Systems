@@ -12,11 +12,23 @@
 
 using namespace std;
 
+//TODO
+//add_bytes after every creation of a file Node
+//update Node size in append_function
+//remove bytes function
+//deallocate on exit
+//breath first search print on dir (is currently depth)
+//prfiles implementation
+//prdisk implementation
+
+
 
 std::vector<Node> globals;
 
 Node * curr_node;
-
+// Lfile * lfile;
+Ldisk * ldisk;
+int block_size = 0;
 void cd_up(){
   if(strcmp(curr_node->name, globals[0].name)==0){
     cout << "Already in the Root directory" << endl << flush;
@@ -32,11 +44,10 @@ void cd(char * directory){
     cd_up();
   }
   else{
-    char * search_char = new char[sizeof(directory)+sizeof(curr_node->name)+1];
+    char search_char [sizeof(directory)+sizeof(curr_node->name)+2] = {};
     strcat(search_char, curr_node->name);
     strcat(search_char, "/");
     strcat(search_char, directory);
-    // cout << "Search Char: " << search_char << endl;
     Node * new_node = curr_node->find_node_by_name(search_char);
     if(new_node != NULL){
       curr_node = new_node;
@@ -48,14 +59,13 @@ void cd(char * directory){
 }
 
 void ls(){
-  std::vector<Node*> the_childs = curr_node->children;
-  for(int i =0; i< the_childs.size(); i++){
-    cout << the_childs[i]->name << endl;
+  for(int i =0; i< curr_node->children.size(); i++){
+    cout << curr_node->children[i]->name << endl;
   }
 }
 
 void mkdir(char * directory){
-  char * search_char = new char[sizeof(directory)+sizeof(curr_node->name)+1];
+  char search_char [sizeof(directory)+sizeof(curr_node->name)+2]= {};
   strcat(search_char, curr_node->name);
   strcat(search_char, "/");
   strcat(search_char, directory);
@@ -63,13 +73,14 @@ void mkdir(char * directory){
   time_t timer;
   time(&timer);
   //create new node
-  Node * new_node = new Node(0, search_char, 0, timer);
+  Node * new_node = new Node(0, search_char, 0, timer, NULL);
   curr_node->add_child(new_node);
   new_node->set_parent(curr_node);
+  // delete search_char;
 }
 
 void create_function(char * directory){
-  char * search_char = new char[sizeof(directory)+sizeof(curr_node->name)+1];
+  char search_char [sizeof(directory)+sizeof(curr_node->name)+2] = {};
   strcat(search_char, curr_node->name);
   strcat(search_char, "/");
   strcat(search_char, directory);
@@ -77,18 +88,42 @@ void create_function(char * directory){
   time_t timer;
   time(&timer);
   //create new node
-  Node * new_node = new Node(1, search_char, 0, timer);
+  Node * new_node = new Node(1, search_char, 0, timer, new Lfile(0,NULL, block_size));
+  //Don't need to update size here because it will always be 0
   curr_node->add_child(new_node);
   new_node->set_parent(curr_node);
-
+  // delete search_char;
 }
 
+void append_function(char * file, char * bytes){
+  char search_char [sizeof(file)+sizeof(curr_node->name)+2] = {};
+  strcat(search_char, curr_node->name);
+  strcat(search_char, "/");
+  strcat(search_char, file);
+
+  Node * node_to_append = curr_node->find_node_by_name(search_char);
+
+  if(node_to_append == NULL){
+    cout << "File not found" << endl << flush;
+  }
+  else {
+    if(!node_to_append->type){
+      cout << "Cannot append to directory" << endl << flush;
+    }
+    else{
+      node_to_append->f->add_bytes(atoi(bytes), ldisk);
+      node_to_append->update_size();
+      globals[0].increase_all_parents_size(curr_node, atoi(bytes));
+    }
+  }
+
+}
 
 
 
 
 void delete_function(char * file_directory){
-  char * search_char = new char[sizeof(file_directory)+sizeof(curr_node->name)+1];
+  char search_char [sizeof(file_directory)+sizeof(curr_node->name)+2] = {};
   strcat(search_char, curr_node->name);
   strcat(search_char, "/");
   strcat(search_char, file_directory);
@@ -119,12 +154,11 @@ int main(int argc, char * const argv[]){
   int file_list_index;
   int dir_list_index;
   int disk_size = 0;
-  int block_size = 0;
 
   //initialize globals  ----REMEMBER TO DELETE
   time_t timer;
   time(&timer);
-  globals.push_back(Node(0, "", 0, timer));
+  globals.push_back(Node(0, "", 0, timer, NULL));
   // globals.push_back(Node(0, "", 0, timer));
   // Basic error checking, more for us to not make silly mistake
   if(argc != 9){
@@ -154,7 +188,7 @@ int main(int argc, char * const argv[]){
       return 1;
     }
   }
-
+  ldisk = new Ldisk(disk_size, block_size);
   // Testing argument parsing
   // cout << "File List: " << file_list_file << endl;
   // cout << "Dir List: " << dir_list_file << endl;
@@ -188,7 +222,7 @@ int main(int argc, char * const argv[]){
             time_t timer;
             time(&timer);
             //create root node
-            globals[0] = Node(0, ".", 0, timer);
+            globals[0] = Node(0, ".", 0, timer, NULL);
             //set the roots parent
             globals[0].set_parent(NULL);
 
@@ -198,7 +232,7 @@ int main(int argc, char * const argv[]){
             time_t timer;
             time(&timer);
             //create new node
-            Node * temp_node = new Node(0, line_char, 0, timer);
+            Node * temp_node = new Node(0, line_char, 0, timer, NULL);
 
             //set parent of new node to the root
             temp_node->set_parent(&globals[0]);
@@ -217,7 +251,7 @@ int main(int argc, char * const argv[]){
 
         time_t timer;
         time(&timer);
-        Node * new_node = new Node(0, line_char, 0, timer);
+        Node * new_node = new Node(0, line_char, 0, timer, NULL);
 
         //add child to the parent
         parent_node->add_child(new_node);
@@ -252,7 +286,7 @@ int main(int argc, char * const argv[]){
       char *eleven_char = new char[eleven.length() + 1];
       strcpy(eleven_char, eleven.c_str());
 
-      char *parent_char = new char[parent.length() + 1];
+      char *parent_char = new char[parent.length() + 1  ];
       strcpy(parent_char, parent.c_str());
 
 
@@ -265,8 +299,8 @@ int main(int argc, char * const argv[]){
           time_t timer;
           time(&timer);
           //create new node
-          Node * temp_node = new Node(1, eleven_char, seven, timer);
-
+          Node * temp_node = new Node(1, eleven_char, seven, timer, new Lfile(0,NULL, block_size));
+          temp_node->f->add_bytes(seven, ldisk);
           //set parent of new node to the root
           temp_node->set_parent(&globals[0]);
           //add new node to child of root
@@ -284,8 +318,8 @@ int main(int argc, char * const argv[]){
 
       time_t timer;
       time(&timer);
-      Node * new_node = new Node(1, eleven_char, seven, timer);
-
+      Node * new_node = new Node(1, eleven_char, seven, timer, new Lfile(0,NULL, block_size));
+      new_node->f->add_bytes(seven, ldisk);
       //add child to the parent
       parent_node->add_child(new_node);
       //set it's parent
@@ -339,15 +373,15 @@ int main(int argc, char * const argv[]){
       ls();
     }
     else if(strcmp(command_line_inputs[0], "mkdir") == 0){   //mkdir
-
       mkdir(command_line_inputs[1]);
     }
     else if(strcmp(command_line_inputs[0], "create") == 0){   //create
-      // cout << "Hit create" << endl;
       create_function(command_line_inputs[1]);
     }
     else if(strcmp(command_line_inputs[0], "append") == 0){   //append
       cout << "Hit append" << endl;
+      append_function(command_line_inputs[1], command_line_inputs[2]);
+
       // append(command_line_inputs[1], command_line_inputs[2]);
     }
     else if(strcmp(command_line_inputs[0], "remove") == 0){   //remove
