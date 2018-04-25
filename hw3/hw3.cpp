@@ -58,8 +58,15 @@ void cd(char * directory){
 
 void ls(){
   for(int i =0; i< curr_node->children.size(); i++){
-    cout << curr_node->children[i]->name << endl;
+    string curr_name = string(curr_node->children[i]->name);
+    int j = curr_name.length();
+    while (curr_name[j] != '/') {
+      j--;
+    }
+    std::cout << curr_name.substr(j+1) << ' ' << flush;
+    //cout << curr_node->children[i]->name << endl;
   }
+  std::cout << '\n' << flush;
 }
 
 void mkdir(char * directory){
@@ -370,8 +377,7 @@ int main(int argc, char * const argv[]){
   // globals[1] = globals[0];
   curr_node = &globals[0];
   while(true){
-    cout << "cats&dogs:  " << curr_node->name << endl;
-    cout << ">>> ";
+    cout << "cats&dogs:  " << curr_node->name << " >>> " << flush;
     char input[128]; //input char array
     cin.getline(input, 128); //get input from user
     vector<char *> command_line_inputs;
