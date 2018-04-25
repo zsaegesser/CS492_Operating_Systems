@@ -427,7 +427,7 @@ int main(int argc, char * const argv[]){
       // prfiles();
     }
     else if(strcmp(command_line_inputs[0], "prdisk") == 0){   //prdisk
-      cout << "Hit prdisk" << endl;
+      cout << total_fragmentation(&globals[0]) << endl << flush;
       // prdisk();
     }
     else {
@@ -435,10 +435,5 @@ int main(int argc, char * const argv[]){
     }
 
   }
-
-
-
-
   return 0;
-
 }
