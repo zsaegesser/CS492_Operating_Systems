@@ -233,12 +233,21 @@ public:
       current = current->next;
       i++;
     }
-    // if (start->range.second == ldisk_size) { //checks if top of range is equal to ldisk_size
-    //   std::cout << start->id << '\n';
-    //   return;
-    // }else{
-    //   std::cout << "Block Group: " << start->id << " Range: " << start->range.first << ", " << start->range.second <<'\n' << flush;
-    //   this->print(start->next);
-    // }
+  }
+
+  //printout of ldisk for footer
+  void print_footer(){
+    block_group * current = this->head;
+    int i = 0;
+    while (current!=NULL) {
+      if (current->used) {
+        std::cout << "In use: " << current->range.first << "-" << current->range.second << '\n' << flush;
+      }else{
+        std::cout << "Free: " << current->range.first << "-" << current->range.second << '\n' << flush;
+      }
+      //std::cout << "Block Group: " << i <<"| Used: " << current->used << "| Range: " << current->range.first << ", " << current->range.second <<'\n' << flush;
+      current = current->next;
+      i++;
+    }
   }
 };
