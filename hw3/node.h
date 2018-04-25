@@ -232,17 +232,34 @@ static void delete_node_for_good(Node* old_node){
   return;
 }
 
+static void delete_tree(Node * root_node){
+  queue<Node*>  print_queue;  //queue of nodes
+  print_queue.push(root_node);//add root to queue
+  while (print_queue.size() != 0) {/*queue isn't empty */
+    Node * curr_node = print_queue.front();
+    for (size_t i = 0; i < curr_node->children.size(); i++) {/*size of children vector at head of queue*/
+      //push_back child node to queue
+      print_queue.push(curr_node->children[i]);
 
-
-
-
-
-static void delete_tree(Node * curr_node){
-  if(curr_node->children.size() > 0) {//while children exist
-    for (size_t i = 0; i < curr_node->children.size(); i++) {
-      delete_tree(curr_node->children[i]);
     }
+    //std::cout <<"DELETED: " << curr_node->name << '\n' <<flush;
+    delete curr_node->f;
+    delete curr_node;
+
+    //pop queue
+    print_queue.pop();
   }
-  // delete curr_node;
-  return;
 }
+
+
+
+
+// static void delete_tree(Node * curr_node){
+//   if(curr_node->children.size() > 0) {//while children exist
+//     for (size_t i = 0; i < curr_node->children.size(); i++) {
+//       delete_tree(curr_node->children[i]);
+//     }
+//   }
+//   // delete curr_node;
+//   return;
+// }

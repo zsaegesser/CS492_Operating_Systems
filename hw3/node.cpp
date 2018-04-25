@@ -101,29 +101,34 @@ using namespace std;
 
 
 int main(int argc, char * const argv[]){
+  Ldisk * ldisk;
   time_t timer;
   time(&timer);
-  Node * one = new Node(0, "2", 12, timer);
-  Node * two = new Node(0, "4", 18, timer);
-  Node * three = new Node(0,"5", 18, timer);
-  Node * four = new Node(0, "3", 18, timer);
-  Node * five = new Node(0, "6", 18, timer);
-  Node * root = new Node(0, "1", 12, timer);
-  root->add_child(one);
-  root->add_child(four);
-  //
-  one->set_parent(root);
-  four->set_parent(root);
-  //
-  one->add_child(two);
-  one->add_child(three);
-  // // std::cout << "Size of one Children: "<< one.children.size() << endl;
-  four->add_child(five);
-  two->set_parent(one);
-  three->set_parent(one);
-  five->set_parent(four);
+  //Node * one = new Node(0, "2", 12, timer, ldisk);
+  // Node * two = new Node(0, "4", 18, timer, ldisk);
+  // Node * three = new Node(0,"5", 18, timer);
+  // Node * four = new Node(0, "3", 18, timer);
+  // Node * five = new Node(0, "6", 18, timer);
+  Node * root = new Node(0, "1", 12, timer, new Lfile(0,NULL, 10));
+  // root->add_child(one);
+  // root->add_child(four);
+  // //
+  // one->set_parent(root);
+  // four->set_parent(root);
+  // //
+  // one->add_child(two);
+  // one->add_child(three);
+  // // // std::cout << "Size of one Children: "<< one.children.size() << endl;
+  // four->add_child(five);
+  // two->set_parent(one);
+  // three->set_parent(one);
+  // five->set_parent(four);
   //
   //print_tree(&root, 0);
+  std::cout << "PRE" << '\n';
+  print_treeB(root);
+  std::cout << "POST" << '\n';
+  delete root;
   print_treeB(root);
   // print(is_some_child(root, one))
   //cout << is_some_child(five, four) << endl;
