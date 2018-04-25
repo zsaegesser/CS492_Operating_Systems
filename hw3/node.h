@@ -196,7 +196,9 @@ static void delete_node(Node* old_node){
     }
   }
   // cout << "Size of children AFTER: "<< parent->children.size() << endl;
-  delete old_node->f;
+  if(old_node->type){
+    delete old_node->f;
+  }
   old_node->children.clear();
   vector<Node*>().swap(old_node->children);
   delete old_node->name;
