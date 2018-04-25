@@ -195,6 +195,7 @@ static void delete_node(Node* old_node){
       parent->children.erase(parent->children.begin()+i);
     }
   }
+
   // cout << "Size of children AFTER: "<< parent->children.size() << endl;
   if(old_node->type){
     delete old_node->f;
@@ -205,12 +206,43 @@ static void delete_node(Node* old_node){
   delete old_node;
 }
 
+static void delete_node_for_good(Node* old_node){
+  // Node * parent = old_node->parent;
+  // old_node->decrease_all_parents_size(parent, old_node->size);
+  // cout << "Parent Pointer: " << parent << endl << flush;
+  // std::vector<Node*> parent->children = parent->children;
+  // cout << "Children vect: " << parent->children << endl << flush;
+  // cout << "Parent: " << parent->name << endl;
+  // cout << "Size of children BEFORE: " << parent->children.size()<< endl;
+  // for(int i =0; i < parent->children.size(); i++){
+  //   if(strcmp(parent->children[i]->name, old_node->name)==0){
+  //     parent->children.erase(parent->children.begin()+i);
+  //   }
+  // }
+
+  // cout << "Size of children AFTER: "<< parent->children.size() << endl;
+  //
+  // if(old_node->type){
+  //   delete old_node->f;
+  // }
+  // old_node->children.clear();
+  // vector<Node*>().swap(old_node->children);
+  // delete old_node->name;
+  // delete old_node;
+  return;
+}
+
+
+
+
+
+
 static void delete_tree(Node * curr_node){
-  while (curr_node->children.size() > 0) {//while children exist
+  if(curr_node->children.size() > 0) {//while children exist
     for (size_t i = 0; i < curr_node->children.size(); i++) {
       delete_tree(curr_node->children[i]);
     }
   }
-  delete_node(curr_node);
+  // delete curr_node;
   return;
 }
