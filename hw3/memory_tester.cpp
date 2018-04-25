@@ -14,25 +14,38 @@ using namespace std;
 int main(int argc, char * const argv[]){
   Ldisk * d = new Ldisk(100,10); // (disk_size, block_size)
   Lfile * f = new Lfile(0, NULL, 10);
-  cout << "initialize" <<endl << flush;
+  // cout << "initialize" <<endl << flush;
+
+  f->add_bytes(5, d);
   d->print();
   f->print_lfile();
-
-  f->add_bytes(100, d);
-
-  cout << "Added" <<  endl << flush;
+  f->add_bytes(6,d);
   d->print();
   f->print_lfile();
+  f->add_bytes(46,d);
+  d->print();
+  f->print_lfile();
+  cout << " FRAG: " <<f->frag_count() << endl << flush;
+  f->remove_bytes(3,d);
+  d->print();
+  f->print_lfile();
+  f->remove_bytes(5,d);
+  d->print();
+  f->print_lfile();
+  cout << " FRAG: " <<f->frag_count() << endl << flush;
+  // cout << "Added" <<  endl << flush;
+  // d->print();
+  // f->print_lfile();
 
   // f->remove_bytes(5, d);
-  f->remove_bytes(90, d);
+  // f->remove_bytes(90, d);
 
   // f->add_bytes(100, d);
   // f->add_bytes(5,d);
   // f->add_bytes(6,d);
-  cout << " Removed" << endl << flush;
-  d->print();
-  f->print_lfile();
+  // cout << " Removed" << endl << flush;
+  // d->print();
+  // f->print_lfile();
 
 
 

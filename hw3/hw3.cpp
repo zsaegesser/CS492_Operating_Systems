@@ -9,6 +9,7 @@
 #include "node.h"
 #include <time.h>
 #include <fstream>
+#include "lfile.h"
 
 using namespace std;
 
