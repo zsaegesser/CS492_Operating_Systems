@@ -81,7 +81,6 @@ void mkdir(char * directory){
   Node * new_node = new Node(0, search_char, 0, timer, NULL);
   curr_node->add_child(new_node);
   new_node->set_parent(curr_node);
-  // delete search_char;
 }
 
 void create_function(char * directory){
@@ -97,7 +96,6 @@ void create_function(char * directory){
   //Don't need to update size here because it will always be 0
   curr_node->add_child(new_node);
   new_node->set_parent(curr_node);
-  // delete search_char;
 }
 
 void append_function(char * file, char * bytes){
@@ -107,8 +105,6 @@ void append_function(char * file, char * bytes){
   strcat(search_char, file);
 
   Node * node_to_append = curr_node->find_node_by_name(search_char);
-  // d->print();
-  // f->print_lfile();
   if(node_to_append == NULL){
     cout << "File not found" << endl << flush;
   }
@@ -402,25 +398,58 @@ int main(int argc, char * const argv[]){
       split = strtok(NULL, " ");
     }
     if(strcmp(command_line_inputs[0], "cd") == 0){           //cd
-      cd(command_line_inputs[1]);
+      if(command_line_inputs.size() != 2){
+        cout << "Wrong number of parameters" << endl << flush;
+      }
+      else{
+        cd(command_line_inputs[1]);
+      }
+
     }
     else if(strcmp(command_line_inputs[0], "ls") == 0){      //ls
       ls();
     }
     else if(strcmp(command_line_inputs[0], "mkdir") == 0){   //mkdir
-      mkdir(command_line_inputs[1]);
+      if(command_line_inputs.size() != 2){
+        cout << "Wrong number of parameters" << endl << flush;
+      }
+      else {
+        mkdir(command_line_inputs[1]);
+      }
+
     }
     else if(strcmp(command_line_inputs[0], "create") == 0){   //create
-      create_function(command_line_inputs[1]);
+      if(command_line_inputs.size() != 2){
+        cout << "Wrong number of parameters" << endl << flush;
+      }
+      else {
+        create_function(command_line_inputs[1]);
+      }
+
     }
     else if(strcmp(command_line_inputs[0], "append") == 0){   //append
-      append_function(command_line_inputs[1], command_line_inputs[2]);
+      if(command_line_inputs.size() != 3){
+        cout << "Wrong number of parameters" << endl << flush;
+      }
+      else {
+        append_function(command_line_inputs[1], command_line_inputs[2]);
+      }
     }
     else if(strcmp(command_line_inputs[0], "remove") == 0){   //remove
-      remove_function(command_line_inputs[1], command_line_inputs[2]);
+      if(command_line_inputs.size() != 3){
+        cout << "Wrong number of parameters" << endl << flush;
+      }
+      else {
+        remove_function(command_line_inputs[1], command_line_inputs[2]);
+      }
     }
     else if(strcmp(command_line_inputs[0], "delete") == 0){   //delete
-      delete_function(command_line_inputs[1]);
+      if(command_line_inputs.size() != 2){
+        cout << "Wrong number of parameters" << endl << flush;
+      }
+      else {
+        delete_function(command_line_inputs[1]);
+      }
     }
     else if(strcmp(command_line_inputs[0], "dir") == 0){   //dir
       print_treeB(&globals[0]);
