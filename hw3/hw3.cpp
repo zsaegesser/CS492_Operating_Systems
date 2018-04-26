@@ -166,7 +166,8 @@ void delete_function(char * file_directory){
       cout << "Can only delete empty directories" << endl <<flush;
     }
     else{
-
+      long size = new_node->size;
+      new_node->f->remove_bytes(size, ldisk);
       delete_node(new_node);
 
     }
@@ -188,7 +189,9 @@ int main(int argc, char * const argv[]){
   //initialize globals  ----REMEMBER TO DELETE
   time_t timer;
   time(&timer);
-  globals.push_back(Node(0, "", 0, timer, NULL));
+  char * temp_char = new char[1];
+  strcat(temp_char, "");
+  globals.push_back(Node(0, temp_char, 0, timer, NULL));
   // globals.push_back(Node(0, "", 0, timer));
   // Basic error checking, more for us to not make silly mistake
   if(argc != 9){
@@ -252,7 +255,9 @@ int main(int argc, char * const argv[]){
             time_t timer;
             time(&timer);
             //create root node
-            globals[0] = Node(0, ".", 0, timer, NULL);
+            char * root_char = new char[1];
+            strcat(root_char, ".");
+            globals[0] = Node(0, root_char, 0, timer, NULL);
             //set the roots parent
             globals[0].set_parent(NULL);
 
